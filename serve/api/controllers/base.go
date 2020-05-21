@@ -49,7 +49,7 @@ func (a *App) initializeRoutes() {
 
 // app run local
 func (a *App) RunServer() {
-	log.Printf("\nServer starting on port 9000")
+	log.Printf("\nServer starting on port 9000 \n")
 	log.Fatal(http.ListenAndServe(":9000", a.Router))
 }
 
