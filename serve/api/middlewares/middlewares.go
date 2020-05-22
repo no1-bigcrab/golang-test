@@ -8,7 +8,7 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 
-	"serve/api/responses"
+	"golang-first/serve/api/responses"
 )
 
 // SetContentTypeMiddleware sets content-type to json
