@@ -12,6 +12,7 @@ import (
 
 	"golang-first/serve/api/middlewares"
 	"golang-first/serve/api/models"
+	"golang-first/serve/api/urls"
 )
 
 // App export hear
@@ -36,6 +37,9 @@ func (a *App) Initialize(DbHost, DbPort, DbUser, DbName, DbPassword string) {
 	a.DB.Debug().AutoMigrate(&models.User{}) //database migration
 
 	a.Router = mux.NewRouter().StrictSlash(true)
+
+	a.Router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("."+"/static/"))))
+
 	a.initializeRoutes()
 }
 
@@ -66,13 +70,13 @@ func home(w http.ResponseWriter, r *http.Request) {
 
 	methods := r.Method
 
-	fmt.Println("method:", r.Method) //get request method
+	path := urls.PathUrl()
 
 	switch methods {
 	case "GET":
 		w.Header().Set("Content-Type", "text/html")
 
-		tmpl := template.Must(template.ParseFiles("./api/views/form.html"))
+		tmpl := template.Must(template.ParseFiles(path.TEMPLATE_PATH + "/form.html"))
 		tmpl.Execute(w, r)
 
 	case "POST":
@@ -81,7 +85,6 @@ func home(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "ParseForm() err: %v", err)
 			return
 		}
-		fmt.Fprintf(w, "Post from website! r.PostFrom = %v\n", r.PostForm)
 		name := r.FormValue("name")
 		address := r.FormValue("address")
 		fmt.Fprintf(w, "Name = %s\n", name)
