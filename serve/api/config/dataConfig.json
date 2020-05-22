@@ -1,0 +1,7 @@
+{
+   "data": [
+        {"AP_Key": "New", "password": "CreateNewDoc()"},
+        {"AP_Key": "Open", "password": "OpenDoc()"},
+        {"AP_Key": "Close", "password": "CloseDoc()"}
+        ]
+}
