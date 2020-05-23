@@ -1,17 +1,75 @@
 package controllers
 
 import (
+	"encoding/json"
+	"fmt"
+	"golang-test/serve/api/urls"
+	"io/ioutil"
 	"net/http"
+	"os"
+	"strconv"
 )
 
-func (a *App) homePageGet(w http.ResponseWriter, r *http.Request) {
-
-	// this is the home route
-	http.ServeFile(w, r, "views/form.html")
-
+//Users cs cs
+type Users struct {
+	Users []User `json:"users"`
 }
 
-func (a *App) homePagePost(w http.ResponseWriter, r *http.Request) {
+// User struct which contains a name
+// a type and a list of social links
+type User struct {
+	Name   string `json:"name"`
+	Type   string `json:"type"`
+	Age    int    `json:"Age"`
+	Social Social `json:"social"`
+}
+
+// Social struct which contains a
+// list of links
+type Social struct {
+	Facebook string `json:"facebook"`
+	Twitter  string `json:"twitter"`
+}
+
+//HomePageGet in function
+func (a *App) HomePageGet(w http.ResponseWriter, r *http.Request) {
+
+	path := urls.PathUrl()
+
+	// this is the home route
+	jsonFile, err := os.Open(path.CONFIG_PATH + "dataConfig.json")
+	// if we os.Open returns an error then handle it
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println("Successfully Opened users.json")
+	// defer the closing of our jsonFile so that we can parse it later on
+	defer jsonFile.Close()
+
+	// read our opened xmlFile as a byte array.
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+
+	// we initialize our Users array
+	var users Users
+
+	// we unmarshal our byteArray which contains our
+	// jsonFile's content into 'users' which we defined above
+	json.Unmarshal(byteValue, &users)
+
+	// we iterate through every user within our users array and
+	// print out the user Type, their name, and their facebook url
+	// as just an example
+	for i := 0; i < len(users.Users); i++ {
+		fmt.Println("User Type: " + users.Users[i].Type)
+		fmt.Println("User Age: " + strconv.Itoa(users.Users[i].Age))
+		fmt.Println("User Name: " + users.Users[i].Name)
+		fmt.Println("Facebook Url: " + users.Users[i].Social.Facebook)
+	}
+}
+
+//HomePagePost is func
+func (a *App) HomePagePost(w http.ResponseWriter, r *http.Request) {
 
 	// this is the home route
 	http.ServeFile(w, r, "views/form.html")

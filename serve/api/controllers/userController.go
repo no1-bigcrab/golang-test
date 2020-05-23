@@ -5,9 +5,9 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"golang-first/serve/api/models"
-	"golang-first/serve/api/responses"
-	"golang-first/serve/utils"
+	"golang-test/serve/api/models"
+	"golang-test/serve/api/responses"
+	"golang-test/serve/utils"
 )
 
 // UserSignUp controller for creating new users

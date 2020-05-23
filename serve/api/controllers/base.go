@@ -4,15 +4,14 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"text/template"
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" //postgres
 
-	"golang-first/serve/api/middlewares"
-	"golang-first/serve/api/models"
-	"golang-first/serve/api/urls"
+	"golang-test/serve/api/middlewares"
+	"golang-test/serve/api/models"
+	"golang-test/serve/api/responses"
 )
 
 // App export hear
@@ -54,8 +53,8 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/login", a.Login).Methods("POST")
 
 	//homepage
-	a.Router.HandleFunc("/home", a.homePageGet).Methods("GET")
-	a.Router.HandleFunc("/home", a.homePagePost).Methods("POST")
+	a.Router.HandleFunc("/home", a.HomePageGet).Methods("GET")
+	a.Router.HandleFunc("/home", a.HomePagePost).Methods("POST")
 
 }
 
@@ -66,31 +65,5 @@ func (a *App) RunServer() {
 }
 
 func home(w http.ResponseWriter, r *http.Request) {
-	// this is the home route
-
-	methods := r.Method
-
-	path := urls.PathUrl()
-
-	switch methods {
-	case "GET":
-		w.Header().Set("Content-Type", "text/html")
-
-		tmpl := template.Must(template.ParseFiles(path.TEMPLATE_PATH + "/form.html"))
-		tmpl.Execute(w, r)
-
-	case "POST":
-
-		if err := r.ParseForm(); err != nil {
-			fmt.Fprintf(w, "ParseForm() err: %v", err)
-			return
-		}
-		name := r.FormValue("name")
-		address := r.FormValue("address")
-		fmt.Fprintf(w, "Name = %s\n", name)
-		fmt.Fprintf(w, "Address = %s\n", address)
-
-	default:
-		fmt.Println("don't have methods")
-	}
+	responses.JSON(w, http.StatusOK, "Welcome To serve")
 }

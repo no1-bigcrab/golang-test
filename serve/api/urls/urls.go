@@ -13,6 +13,7 @@ type (
 		RESPONSIVE_PATH string
 		URLS_PATH       string
 		UNTILS_PATH     string
+		CONFIG_PATH     string
 	}
 )
 
@@ -42,6 +43,8 @@ func PathUrl() urls {
 
 	//path utils
 	UrlPatterns.UNTILS_PATH = "/utils/"
+	//path utils
+	UrlPatterns.CONFIG_PATH = UrlPatterns.UrlApi_PATH + "/config/"
 
 	return UrlPatterns
 }

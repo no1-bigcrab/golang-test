@@ -1,4 +1,4 @@
-module golang-first/serve
+module golang-test/serve
 
 go 1.14
 

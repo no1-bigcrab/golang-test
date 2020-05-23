@@ -7,7 +7,7 @@ import (
 
 	"github.com/joho/godotenv"
 
-	"golang-first/serve/api/controllers"
+	"golang-test/serve/api/controllers"
 )
 
 func main() {
