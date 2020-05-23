@@ -1,13 +1,14 @@
 package controllers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"golang-test/serve/api/urls"
+	"html/template"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"strconv"
 )
 
 //Users cs cs
@@ -31,47 +32,71 @@ type Social struct {
 	Twitter  string `json:"twitter"`
 }
 
+//Context is struct
+type Context struct {
+	Title   string
+	Results []User
+}
+
 //HomePageGet in function
 func (a *App) HomePageGet(w http.ResponseWriter, r *http.Request) {
 
 	path := urls.PathUrl()
 
-	// this is the home route
 	jsonFile, err := os.Open(path.CONFIG_PATH + "dataConfig.json")
-	// if we os.Open returns an error then handle it
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	fmt.Println("Successfully Opened users.json")
-	// defer the closing of our jsonFile so that we can parse it later on
 	defer jsonFile.Close()
 
-	// read our opened xmlFile as a byte array.
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 
-	// we initialize our Users array
 	var users Users
 
-	// we unmarshal our byteArray which contains our
-	// jsonFile's content into 'users' which we defined above
 	json.Unmarshal(byteValue, &users)
 
-	// we iterate through every user within our users array and
-	// print out the user Type, their name, and their facebook url
-	// as just an example
-	for i := 0; i < len(users.Users); i++ {
-		fmt.Println("User Type: " + users.Users[i].Type)
-		fmt.Println("User Age: " + strconv.Itoa(users.Users[i].Age))
-		fmt.Println("User Name: " + users.Users[i].Name)
-		fmt.Println("Facebook Url: " + users.Users[i].Social.Facebook)
+	//push data
+	push(w, "static/css/bootstrap.min.css")
+	context := Context{
+		Title:   "My Fruits",
+		Results: users.Users,
 	}
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	html := template.Must(template.ParseFiles(path.TEMPLATE_PATH + "/form.html"))
+	html.Execute(w, context)
+
 }
 
 //HomePagePost is func
 func (a *App) HomePagePost(w http.ResponseWriter, r *http.Request) {
+	//url := "http://localhost:9001"
 
-	// this is the home route
-	http.ServeFile(w, r, "views/form.html")
+	//fmt.Println("URL:>", url)
+	apiKey := r.FormValue("api_key")
+	password := r.FormValue("password")
 
+	values := map[string]string{"apiKey": apiKey, "password": password}
+
+	jsonValue, _ := json.Marshal(values)
+
+	resp, err := http.Post("https://httpbin.org/post",
+		"application/json", bytes.NewBuffer(jsonValue))
+	if err != nil {
+		print(err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		print(err)
+	}
+	fmt.Println(string(body))
+}
+
+func push(w http.ResponseWriter, resource string) {
+	pusher, ok := w.(http.Pusher)
+	if ok {
+		if err := pusher.Push(resource, nil); err == nil {
+			return
+		}
+	}
 }
