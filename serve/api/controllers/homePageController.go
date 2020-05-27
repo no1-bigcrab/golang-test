@@ -44,7 +44,7 @@ func (a *App) HomePageGet(w http.ResponseWriter, r *http.Request) {
 	if err := json.Unmarshal([]byte(body), &data); err != nil {
 		panic(err)
 	}
-	//fmt.Println(data.Products.Images[0].Src)
+	//fmt.Println(data.Products.Images[0].)
 
 	if err != nil {
 		panic(err.Error())
