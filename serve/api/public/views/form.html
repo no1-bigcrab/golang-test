@@ -8,6 +8,14 @@
 
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+        <style>
+            .data-value{
+                display: none;
+            }
+            .open{
+                display: block;
+            }
+        </style>
     </head>
     <body>
       <nav class="nav nav-fill border bg-dark mb-10">
@@ -30,20 +38,55 @@
         <div class="container">
               <form method="POST" action="/home">     
                   <label>API Keys:</label>
-                        <select name="api_key" id="AP_key" class="form-control col-mb-12">
-                            {{range.Results}}
-                                <option value={{.Name}}>{{.Name}}</option>
-                            {{end}}
+                        <select name="api-title" id="api-title" class="form-control col-mb-12 data-title" onchange="myFunction(this.options[this.selectedIndex].value)">
+                                <option value="products">Products</option>
+                                <option value="blogs">Blogs</option>
+                                <option value="pages">Pages</option>
+                                <option value="article">Article</option>
                         </select>
-                  <label>Password:</label><br/>
-                  <input name="password" type="text" value="" class="form-control col-lg-12"/>
-
+                        <br/>
+                        <label>Value Post:</label><br/>
+                        <textarea name="api_key"class="form-control col-mb-12 data-value open" data-value="products">{{.Products.Title}}</textarea>
+                        <textarea name="api_key"class="form-control col-mb-12 data-value open" data-value="products">{{.Products.BodyHTML}}</textarea>
+                        <textarea name="api_key"class="form-control col-mb-12 data-value open" data-value="products">{{.Products.Vendor}}</textarea>
+                        <textarea name="api_key"class="form-control col-mb-12 data-value open" data-value="products">{{.Products.ProductType}}</textarea>
+                        <!-- <select >
+                                <option value=""></option>
+                        </select> -->
+                        <select name=""class="form-control col-mb-12 data-value" data-value="pages">
+                                <option value='{{.Pages}}'>{{.Pages.Title}}</option>
+                        </select>
+                        <select name=""class="form-control col-mb-12 data-value" data-value="blogs">
+                                <option value="{{.Blogs}}">{{.Blogs.Title}}</option>
+                        </select>
+                        <select name=""class="form-control col-mb-12 data-value" data-value="article">
+                                <option value="{{.Article}}">{{.Article.Title}}</option>
+                        </select>
+                        <br/>
                   <input type="submit" value="submit" class="btn btn-success"/>
               </form>
         </div>
     </body>
 
     <!-- Optional JavaScript -->
+    <script type="text/javascript">
+        const pic = document.querySelectorAll('.data-value');
+        
+        function myFunction(chosen){
+                pic.forEach(function(el) {
+                        dataClass = el.getAttribute('data-value');
+                        if (dataClass == chosen) {
+                            el.classList.add('open')
+                            el.setAttribute('name', 'api_key')
+                        } else{
+                            el.classList.remove('open')
+                            el.setAttribute('name', '')
+                        }
+                    });
+            }
+        
+        
+    </script>
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>

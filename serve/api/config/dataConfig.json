@@ -1,22 +1,38 @@
 {
-        "users": [
-          {
-            "name" : "Elliot",
-            "type" : "Reader",
-            "age" : 23,
-            "social" : {
-              "facebook" : "https://facebook.com",
-              "twitter" : "https://twitter.com"
-            }
-          },
-          {
-            "name" : "Fraser",
-            "type" : "Author",
-            "age" : 17,
-            "social" : {
-              "facebook" : "https://facebook.com",
-              "twitter" : "https://twitter.com"
-            }
-          }
-        ]
+  "products":{
+    "title": "Burton Custom Freestyle 151",
+    "body_html": "<strong>Good snowboard!</strong>",
+    "vendor": "Burton",
+    "product_type": "Snowboard",
+    "images": [
+      {
+        "src": "http://example.com/rails_logo.gif"
       }
+    ]
+  },
+  "blogs": {
+    "title": "Apple main blog"
+  },
+  "pages": {
+    "title": "Warranty information",
+    "body_html": "<h2>Warranty</h2>\n<p>Returns accepted if we receive items <strong>30 days after purchase</strong>.</p>",
+    "metafields": [
+      {
+        "key": "new",
+        "value": "new value",
+        "value_type": "string",
+        "namespace": "global"
+      }
+    ]
+  },
+  "article":{
+    "title": "My new Article title",
+    "author": "John Smith",
+    "tags": "This Post, Has Been Tagged",
+    "body_html": "<h1>I like articles</h1>\n<p><strong>Yea</strong>, I like posting them through <span>REST</span>.</p>",
+    "image": {
+      "attachment": "R0lGODlhAQABAIAAAAAAAAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==\n"
+    }
+  }
+  
+}

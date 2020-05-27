@@ -4,38 +4,23 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"golang-test/serve/api/models"
 	"golang-test/serve/api/urls"
-	"html/template"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"text/template"
 )
 
-//Users cs cs
-type Users struct {
-	Users []User `json:"users"`
-}
+//Context is
 
-// User struct which contains a name
-// a type and a list of social links
-type User struct {
-	Name   string `json:"name"`
-	Type   string `json:"type"`
-	Age    int    `json:"Age"`
-	Social Social `json:"social"`
-}
-
-// Social struct which contains a
-// list of links
-type Social struct {
-	Facebook string `json:"facebook"`
-	Twitter  string `json:"twitter"`
-}
-
-//Context is struct
-type Context struct {
-	Title   string
-	Results []User
+//superData
+type superData struct {
+	Title    string `json:"title"`
+	Products models.Products
+	Pages    models.Pages
+	Blogs    models.Blogs
+	Article  models.Article
 }
 
 //HomePageGet in function
@@ -49,33 +34,35 @@ func (a *App) HomePageGet(w http.ResponseWriter, r *http.Request) {
 	}
 	defer jsonFile.Close()
 
-	byteValue, _ := ioutil.ReadAll(jsonFile)
+	body, _ := ioutil.ReadAll(jsonFile)
 
-	var users Users
-
-	json.Unmarshal(byteValue, &users)
-
-	//push data
-	push(w, "static/css/bootstrap.min.css")
-	context := Context{
-		Title:   "My Fruits",
-		Results: users.Users,
+	if err != nil {
+		panic(err.Error())
 	}
+
+	var data superData
+	if err := json.Unmarshal([]byte(body), &data); err != nil {
+		panic(err)
+	}
+	//fmt.Println(data.Products.Images[0].Src)
+
+	if err != nil {
+		panic(err.Error())
+	}
+
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	html := template.Must(template.ParseFiles(path.TEMPLATE_PATH + "/form.html"))
-	html.Execute(w, context)
-
+	html.Execute(w, data)
 }
 
 //HomePagePost is func
 func (a *App) HomePagePost(w http.ResponseWriter, r *http.Request) {
 	//url := "http://localhost:9001"
 
-	//fmt.Println("URL:>", url)
-	apiKey := r.FormValue("api_key")
-	password := r.FormValue("password")
+	title := r.FormValue("api-title")
+	data := r.FormValue("api_key")
 
-	values := map[string]string{"apiKey": apiKey, "password": password}
+	values := map[string]string{"data-title": title, "data-value": data}
 
 	jsonValue, _ := json.Marshal(values)
 
