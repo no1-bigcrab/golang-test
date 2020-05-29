@@ -18,47 +18,66 @@
         </style>
     </head>
     <body>
-      <nav class="nav nav-fill border bg-dark mb-10">
-          <li class="nav-item">
-              <a class="nav-link active" href="#">Item 1</a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Item 2</a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Item 3</a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Item 4</a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Item 5</a>
-          </li>
-      </nav>
         <div class="container">
               <form method="POST" action="/home">     
-                  <label>API Keys:</label>
-                        <select name="api-title" id="api-title" class="form-control col-mb-12 data-title" onchange="myFunction(this.options[this.selectedIndex].value)">
-                                <option value="products">Products</option>
-                                <option value="blogs">Blogs</option>
-                                <option value="pages">Pages</option>
-                                <option value="article">Article</option>
+                   
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <label>API Keys:</label>
+                            <select name="apikey" id="api-key" class="form-control col-mb-12">
+                                <option value="c8f4666a96a5f2dce771c1c04a427308">c8f4666a96a5f2dce771c1c04a427308</option>
+                                <option value="c8f4666a96a5f2dce771c1c04a427308">Blogs</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-6">
+                            <label>Password:</label>
+                        <select name="password" id="password" class="form-control col-mb-12">
+                            <option value="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">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</option>
+                            <option value="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">Blogs</option>
                         </select>
+                        </div>
+                    </div>                        
+                        <br/>
+                        <div class="row">
+                            <div class="col-6">
+                                <label>Type Post:</label>
+                                <select name="api-title" id="api-title" class="form-control col-mb-12 data-title" onchange="myFunction(this.options[this.selectedIndex].value)">
+                                        <option value="products">Products</option>
+                                        <option value="blogs">Blogs</option>
+                                        <option value="pages">Pages</option>
+                                        <option value="article">Article</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label>Domain Host:</label>
+                                <select name="hostname" id="hostname" class="form-control">
+                                        <option value="bigcrab-1.myshopify.com">bigcrab-1.myshopify.com</option>
+                                </select>
+                            </div>
+                        </div>
+                       
                         <br/>
                         <label>Value Post:</label><br/>
-                        <textarea name="api_key"class="form-control col-mb-12 data-value open" data-value="products">Abc blofg </textarea>
-                        <!-- <select >
-                                <option value=""></option>
-                        </select> -->
-                        <select name=""class="form-control col-mb-12 data-value" data-value="pages">
-                                <option value='{{.Pages}}'>{{.Pages.Title}}</option>
-                        </select>
-                        <select name=""class="form-control col-mb-12 data-value" data-value="blogs">
-                                <option value="{{.Blogs}}">{{.Blogs.Title}}</option>
-                        </select>
-                        <select name=""class="form-control col-mb-12 data-value" data-value="article">
-                                <option value="{{.Article}}">{{.Article.Title}}</option>
-                        </select>
+                            <div class="form-control col-md-12 data-value open" data-value="products">
+                                <textarea name="title" id="" class="form-control">{{.Product.Title}}</textarea>
+                                <textarea name="html-body" id="" class="form-control">{{.Product.BodyHTML}}</textarea>
+                                <textarea name="vendor" id="" class="form-control">{{.Product.Vendor}}</textarea>
+                                <textarea name="product-type" id="" class="form-control">{{.Product.ProductType}}</textarea>
+                            </div>                        
+
+                        <!-- blogs -->
+                        <div name=""class="form-control col-mb-12 data-value" data-value="blogs">
+                            <textarea name="" id="" class="form-control">{{.Blogs.Title}}</textarea>
+                        </div>
+                        <div name=""class="form-control col-mb-12 data-value" data-value="pages">
+                            <textarea name="title" id="" class="form-control">{{.Pages.Title}}</textarea>
+                            <textarea name="html_body" id="" class="form-control">{{.Pages.BodyHTML}}</textarea>
+                            <textarea name="shop-id" id="" class="form-control">{{.Pages.ShopID}}</textarea>
+                            <textarea name="author" id="" class="form-control">{{.Pages.Author}}</textarea>
+                        </div>
+                        <div name=""class="form-control col-mb-12 data-value" data-value="article">
+                            <textarea name="title" id="" class="form-control">{{.Article.Title}}</textarea>
+                        </div>
                         <br/>
                   <input type="submit" value="submit" class="btn btn-success"/>
               </form>
@@ -68,20 +87,40 @@
     <!-- Optional JavaScript -->
     <script type="text/javascript">
         const pic = document.querySelectorAll('.data-value');
-        
+
         function myFunction(chosen){
                 pic.forEach(function(el) {
                         dataClass = el.getAttribute('data-value');
                         if (dataClass == chosen) {
-                            el.classList.add('open')
-                            el.setAttribute('name', 'api_key')
+                            el.classList.add('open');
+                            // data_open = el.children;
+                            // //console.log(data_open )
+                            // for( i= 0; i< data_open.length ; i++){
+                            //     data_open[i].setAttribute('name', 'api_value');
+                            //     console.log(data_open[i] )
+
+                            // }
                         } else{
                             el.classList.remove('open')
-                            el.setAttribute('name', '')
+                            // data_open = el.children;
+                            // //console.log(data_open )
+                            // for( i= 0; i< data_open.length ; i++){
+                            //     data_open[i].setAttribute('name', '');
+                            //     console.log(data_open[i] )
+
+                            // }
+                            
                         }
-                    });
-            }
-        
+                });
+
+            // const api_key = document.querySelector('#api-title');
+            // const api_value = document.querySelector('#api_value');
+            // let data = {
+            //             api_key: api_key.value,
+            //             api_value: api_value.value
+            //         }
+            // console.log(data)
+        }
         
     </script>
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

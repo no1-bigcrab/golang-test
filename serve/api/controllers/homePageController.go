@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"golang-test/serve/api/models"
@@ -16,11 +15,11 @@ import (
 
 //superData
 type superData struct {
-	Title    string `json:"title"`
-	Products models.Products
-	Pages    models.Pages
-	Blogs    models.Blogs
-	Article  models.Article
+	Title   string `json:"title"`
+	Product models.Product
+	Pages   models.Pages
+	Blogs   models.Blogs
+	Article models.Article
 }
 
 //HomePageGet in function
@@ -44,7 +43,7 @@ func (a *App) HomePageGet(w http.ResponseWriter, r *http.Request) {
 	if err := json.Unmarshal([]byte(body), &data); err != nil {
 		panic(err)
 	}
-	//fmt.Println(data.Products.Images[0].)
+	//fmt.Println(data.Products.Images[0].Src)
 
 	if err != nil {
 		panic(err.Error())
@@ -57,26 +56,48 @@ func (a *App) HomePageGet(w http.ResponseWriter, r *http.Request) {
 
 //HomePagePost is func
 func (a *App) HomePagePost(w http.ResponseWriter, r *http.Request) {
-	//url := "http://localhost:9001"
-
-	title := r.FormValue("api-title")
-	data := r.FormValue("api_key")
-
-	values := map[string]string{"data-title": title, "data-value": data}
-
-	jsonValue, _ := json.Marshal(values)
-
-	resp, err := http.Post("https://httpbin.org/post",
-		"application/json", bytes.NewBuffer(jsonValue))
-	if err != nil {
-		print(err)
+	r.ParseForm()
+	url := "https://" + r.FormValue("apikey") + ":" + r.FormValue("password") + "@" + r.FormValue("hostname") + "/admin/api/2020-04/" + r.FormValue("api-title") + ".json"
+	fmt.Println(url)
+	for key, values := range r.PostForm {
+		fmt.Println(key, values)
 	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		print(err)
-	}
-	fmt.Println(string(body))
+
+	//fmt.Println(r.Form)
+	// req, err := http.NewRequest("POST", url, nil)
+	// req.Header.Set("X-Shopify-Access-Token", r.FormValue("password"))
+	// req.Header.Set("Content-Type", "application/json")
+	// client := &http.Client{}
+	// resp, err := client.Do(req)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// defer resp.Body.Close()
+	// fmt.Println("response Status:", resp.Status)
+	// body, _ := ioutil.ReadAll(resp.Body)
+	// var m interface{}
+	// json.Unmarshal(body, &m)
+	// fmt.Println(m)
+	// switch v := m.(type) {
+	// case map[string]interface{}:
+	// 	{
+	// 		switch h := v["products"].(type) {
+	// 		case []interface{}:
+	// 			{
+	// 				fmt.Println("ok")
+	// 				for _, x := range h {
+	// 					if x.(map[string]interface{})["role"] == "main" {
+	// 						json.NewEncoder(w).Encode(map[string]interface{}{"data": x.(map[string]interface{})["id"]})
+	// 					}
+	// 				}
+	// 			}
+	// 		default:
+	// 			fmt.Println("No type found")
+	// 		}
+	// 	}
+	// default:
+	// 	fmt.Println("No type found")
+	// }
 }
 
 func push(w http.ResponseWriter, resource string) {

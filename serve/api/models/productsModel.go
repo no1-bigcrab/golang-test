@@ -1,7 +1,7 @@
 package models
 
-// Products abc
-type Products struct {
+// Product abc
+type Product struct {
 	Title             string      `json:"title"`
 	BodyHTML          string      `json:"body_html"`
 	Vendor            string      `json:"vendor"`
