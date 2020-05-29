@@ -58,17 +58,30 @@
                         <div id="result" class="row">
                             <div class="form-control col-md-12 data-value" data-value="products">
                                 <label>Title:</label> 
-<br/>
+                                <br/>
                                 <textarea name="title" id="" class="form-control">{{.Product.Title}}</textarea>
                                 <label>Body html:</label> 
-<br/>
-                                <textarea name="html-body" id="" class="form-control">{{.Product.BodyHTML}}</textarea>
-                                <label>Vendor:</label> 
-<br/>
-                                <textarea name="vendor" id="" class="form-control">{{.Product.Vendor}}</textarea>
-                                <label>Product type::</label> 
-<br/>
-                                <textarea name="product-type" id="" class="form-control">{{.Product.ProductType}}</textarea>
+                                <br/>
+                                <textarea name="html-body" id="" class="form-control" rows="8">{{.Product.BodyHTML}}</textarea>
+                                <br/>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <label>Vendor:</label> 
+                                        <br/>
+                                        <select name="vendor" id="vendor" class="form-control">
+                                                <option value="{{.Product.Vendor}}">{{.Product.Vendor}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <label>Product type::</label> 
+                                        <br/>
+                                        <select name="product-type" id="product-type" class="form-control">
+                                            <option value="{{.Product.ProductType}}">{{.Product.ProductType}}</option>
+                                        </select> 
+                                    </div>
+                                    
+                                </div>
+                                
                             </div> 
                         </div>
 
@@ -81,51 +94,62 @@
     <!-- Optional JavaScript -->
     <script type="text/javascript">
         function myFunction(chosen){
-            var products = `<div class="form-control col-md-12 data-value" data-value="products">
+            var products = ` <div class="form-control col-md-12 data-value" data-value="products">
                                 <label>Title:</label> 
-<br/>
+                                <br/>
                                 <textarea name="title" id="" class="form-control">{{.Product.Title}}</textarea>
                                 <label>Body html:</label> 
-<br/>
-                                <textarea name="html-body" id="" class="form-control">{{.Product.BodyHTML}}</textarea>
-                                <label>Vendor:</label> 
-<br/>
-                                <textarea name="vendor" id="" class="form-control">{{.Product.Vendor}}</textarea>
-                                <label>Product type::</label> 
-<br/>
-                                <textarea name="product-type" id="" class="form-control">{{.Product.ProductType}}</textarea>
+                                <br/>
+                                <textarea name="html-body" id="" class="form-control" rows="8">{{.Product.BodyHTML}}</textarea>
+                                <br/>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <label>Vendor:</label> 
+                                        <br/>
+                                        <select name="vendor" id="vendor" class="form-control">
+                                                <option value="{{.Product.Vendor}}">{{.Product.Vendor}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <label>Product type::</label> 
+                                        <br/>
+                                        <select name="product-type" id="product-type" class="form-control">
+                                            <option value="{{.Product.ProductType}}">{{.Product.ProductType}}</option>
+                                        </select> 
+                                    </div>
+                                </div>
                             </div> `;
             var blogs = `<div name=""class="form-control col-mb-12 data-value" data-value="blogs">
                             <label>Title:</label> 
-<br/>
-                            <textarea name="" id="" class="form-control">{{.Blogs.Title}}</textarea>
+                            <br/>
+                            <textarea name="title" id="" class="form-control">{{.Blogs.Title}}</textarea>
                         </div>`;
             var pages = `<div name=""class="form-control col-mb-12 data-value" data-value="pages">
                             <label>Title:</label> 
-<br/>
+                            <br/>
                             <textarea name="title" id="" class="form-control">{{.Pages.Title}}</textarea>
                             <label>Body html:</label> 
-<br/>
+                            <br/>
                             <textarea name="html_body" id="" class="form-control">{{.Pages.BodyHTML}}</textarea>
                             <label>Author:</label> 
-<br/>
+                            <br/>
                             <textarea name="author" id="" class="form-control">{{.Pages.Author}}</textarea>
                         </div>`;
             var article =`<div name=""class="form-control col-mb-12 data-value" data-value="article">
                             <label>Title:</label> 
-<br/>
+                            <br/>
                             <textarea name="title" id="" class="form-control">{{.Article.Title}}</textarea>
                             <label>Author:</label> 
-<br/>
+                            <br/>
                             <textarea name="author" id="" class="form-control">{{.Article.Author}}</textarea>
                             <label>Body html:</label> 
-<br/> <br/>
+                            <br/> <br/>
                             <textarea name="html-body" id="" class="form-control">{{.Article.BodyHTML}}</textarea>
                             <label>Tags:</label> 
-<br/>
+                            <br/>
                             <textarea name="tags" id="" class="form-control">{{.Article.Tags}}</textarea>
                             <label>Image:</label> 
-<br/>
+                            <br/>
                             <textarea name="image" id="" class="form-control">{{.Article.Image.Attachment}}</textarea>
 
                         </div>`;
