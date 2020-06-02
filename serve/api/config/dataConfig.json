@@ -4,9 +4,30 @@
     "body_html": "<strong>Good snowboard!</strong>",
     "vendor": "Burton",
     "product_type": "Snowboard",
-    "images": [
+    "variants": [
       {
-        "src": "http://example.com/rails_logo.gif"
+        "option1": "Blue",
+        "option2": "155"
+      },
+      {
+        "option1": "Black",
+        "option2": "159"
+      }
+    ],
+    "options": [
+      {
+        "name": "Color",
+        "values": [
+          "Blue",
+          "Black"
+        ]
+      },
+      {
+        "name": "Size",
+        "values": [
+          "155 px",
+          "159 px"
+        ]
       }
     ]
   },

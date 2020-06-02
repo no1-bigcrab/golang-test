@@ -12,6 +12,12 @@
             label{
                 font-weight: bold;
             }
+            .option{
+                display: none;
+            }
+            .open{
+                display: block;
+            }
         </style>
     </head>
     <body>
@@ -57,31 +63,78 @@
                         <label>Value Post:</label><br/>
                         <div id="result" class="row">
                             <div class="form-control col-md-12 data-value" data-value="products">
-                                <label>Title:</label> 
-                                <br/>
-                                <textarea name="title" id="" class="form-control">{{.Product.Title}}</textarea>
-                                <label>Body html:</label> 
-                                <br/>
-                                <textarea name="html-body" id="" class="form-control" rows="8">{{.Product.BodyHTML}}</textarea>
-                                <br/>
+                                
                                 <div class="row">
+                                    <div class="col-lg-6">
+                                        <label>Title:</label> 
+                                        <br/>
+                                        <textarea name="title" id="" class="form-control">{{.Product.Title}}</textarea>
+                                        <br/>
+                                        <label>Body html:</label> 
+                                        <br/>
+                                        <textarea name="html-body" id="" class="form-control" rows="9">{{.Product.BodyHTML}}</textarea>
+                                        <br/>
+                                    </div>
+                                    
                                     <div class="col-lg-6">
                                         <label>Vendor:</label> 
                                         <br/>
                                         <select name="vendor" id="vendor" class="form-control">
                                                 <option value="{{.Product.Vendor}}">{{.Product.Vendor}}</option>
                                         </select>
-                                    </div>
-                                    <div class="col-lg-6">
+                                        <br/>
                                         <label>Product type::</label> 
                                         <br/>
                                         <select name="product-type" id="product-type" class="form-control">
                                             <option value="{{.Product.ProductType}}">{{.Product.ProductType}}</option>
                                         </select> 
+                                        <br/>
+                                        {{if .Product.Variants}}
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <label for="color"> Color:</label>
+                                                    <select name="variants-color" id="variants" class="form-control">
+                                                        {{range $key, $val := .Product.Variants}} 
+                                                            <option value="{{$val.Option1}}" data-key="{{$key}}">{{$val.Option1}}</option>
+                                                        {{end}}  
+                                                    </select> 
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <label for="size"> Size:</label>
+                                                    <select name="variants-size" id="variants" class="form-control">
+                                                        {{range $key, $val := .Product.Variants}} 
+                                                            <option value="{{$val.Option2}}" data-key="{{$key}}">{{$val.Option2}} px</option>
+                                                        {{end}}  
+                                                    </select> 
+                                                </div>
+                                            </div>
+                                        {{end}}
+                                        <br/>
+                                        {{if .Product.Options}}
+                                            <div class="row">
+                                                    <div class="col-lg-6">
+                                                        <label for="name"> Name:</label>
+                                                        <select name="options-name" id="options" class="form-control" onchange="myOption(this.options[this.selectedIndex])">
+                                                            <option><---></option>
+                                                            {{range $key, $val := .Product.Options}} 
+                                                                <option value="{{$val.Name}}" data-key="{{$key}}">{{$val.Name}}</option>
+                                                            {{end}}  
+                                                        </select> 
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <label for="size"> Value:</label>
+                                                            {{range $key, $val := .Product.Options}} 
+                                                                <select name="options-value" id="{{$val.Name}}" class="form-control option" data-value="{{$key}}">
+                                                                    {{range $keys, $vals := $val.Values}} 
+                                                                        <option value="{{$vals}}" >{{$vals}}</option>
+                                                                    {{end}}
+                                                                </select> 
+                                                            {{end}}  
+                                                    </div>
+                                            </div>
+                                        {{end}}
                                     </div>
-                                    
                                 </div>
-                                
                             </div> 
                         </div>
 
@@ -93,83 +146,96 @@
 
     <!-- Optional JavaScript -->
     <script type="text/javascript">
-        function myFunction(chosen){
-            var products = ` <div class="form-control col-md-12 data-value" data-value="products">
+        function myFunction(chosen) {
+                var products = ` <div class="form-control col-md-12 data-value" data-value="products">
+                                    <label>Title:</label> 
+                                    <br/>
+                                    <textarea name="title" id="" class="form-control">{{.Product.Title}}</textarea>
+                                    <label>Body html:</label> 
+                                    <br/>
+                                    <textarea name="html-body" id="" class="form-control" rows="8">{{.Product.BodyHTML}}</textarea>
+                                    <br/>
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <label>Vendor:</label> 
+                                            <br/>
+                                            <select name="vendor" id="vendor" class="form-control">
+                                                    <option value="{{.Product.Vendor}}">{{.Product.Vendor}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <label>Product type::</label> 
+                                            <br/>
+                                            <select name="product-type" id="product-type" class="form-control">
+                                                <option value="{{.Product.ProductType}}">{{.Product.ProductType}}</option>
+                                            </select> 
+                                        </div>
+                                    </div>
+                                </div> `;
+                var blogs = `<div name=""class="form-control col-mb-12 data-value" data-value="blogs">
                                 <label>Title:</label> 
                                 <br/>
-                                <textarea name="title" id="" class="form-control">{{.Product.Title}}</textarea>
+                                <textarea name="title" id="" class="form-control">{{.Blogs.Title}}</textarea>
+                            </div>`;
+                var pages = `<div name=""class="form-control col-mb-12 data-value" data-value="pages">
+                                <label>Title:</label> 
+                                <textarea name="title" id="" class="form-control">{{.Pages.Title}}</textarea>
+                                <br/>
                                 <label>Body html:</label> 
+                                <textarea name="html_body" id="" class="form-control">{{.Pages.BodyHTML}}</textarea>
                                 <br/>
-                                <textarea name="html-body" id="" class="form-control" rows="8">{{.Product.BodyHTML}}</textarea>
+                                <label>Author:</label> 
+                                <textarea name="author" id="" class="form-control">{{.Pages.Author}}</textarea>
                                 <br/>
-                                <div class="row">
-                                    <div class="col-lg-6">
-                                        <label>Vendor:</label> 
-                                        <br/>
-                                        <select name="vendor" id="vendor" class="form-control">
-                                                <option value="{{.Product.Vendor}}">{{.Product.Vendor}}</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <label>Product type::</label> 
-                                        <br/>
-                                        <select name="product-type" id="product-type" class="form-control">
-                                            <option value="{{.Product.ProductType}}">{{.Product.ProductType}}</option>
-                                        </select> 
-                                    </div>
-                                </div>
-                            </div> `;
-            var blogs = `<div name=""class="form-control col-mb-12 data-value" data-value="blogs">
-                            <label>Title:</label> 
-                            <br/>
-                            <textarea name="title" id="" class="form-control">{{.Blogs.Title}}</textarea>
-                        </div>`;
-            var pages = `<div name=""class="form-control col-mb-12 data-value" data-value="pages">
-                            <label>Title:</label> 
-                            <br/>
-                            <textarea name="title" id="" class="form-control">{{.Pages.Title}}</textarea>
-                            <label>Body html:</label> 
-                            <br/>
-                            <textarea name="html_body" id="" class="form-control">{{.Pages.BodyHTML}}</textarea>
-                            <label>Author:</label> 
-                            <br/>
-                            <textarea name="author" id="" class="form-control">{{.Pages.Author}}</textarea>
-                        </div>`;
-            var article =`<div name=""class="form-control col-mb-12 data-value" data-value="article">
-                            <label>Title:</label> 
-                            <br/>
-                            <textarea name="title" id="" class="form-control">{{.Article.Title}}</textarea>
-                            <label>Author:</label> 
-                            <br/>
-                            <textarea name="author" id="" class="form-control">{{.Article.Author}}</textarea>
-                            <label>Body html:</label> 
-                            <br/> <br/>
-                            <textarea name="html-body" id="" class="form-control">{{.Article.BodyHTML}}</textarea>
-                            <label>Tags:</label> 
-                            <br/>
-                            <textarea name="tags" id="" class="form-control">{{.Article.Tags}}</textarea>
-                            <label>Image:</label> 
-                            <br/>
-                            <textarea name="image" id="" class="form-control">{{.Article.Image.Attachment}}</textarea>
+                            </div>`;
+                var article =`<div name=""class="form-control col-mb-12 data-value" data-value="article">
+                                <label>Title:</label> 
+                                <textarea name="title" id="" class="form-control">{{.Article.Title}}</textarea>
+                                <br/>
+                                <label>Author:</label> 
+                                <textarea name="author" id="" class="form-control">{{.Article.Author}}</textarea>
+                                <br/>
+                                <label>Body html:</label> 
+                                <textarea name="html-body" id="" class="form-control">{{.Article.BodyHTML}}</textarea>
+                                <br/>
+                                <label>Tags:</label> 
+                                <textarea name="tags" id="" class="form-control">{{.Article.Tags}}</textarea>
+                                <br/>
+                                <label>Image:</label> 
+                                <textarea name="image" id="" class="form-control">{{.Article.Image.Attachment}}</textarea>
 
-                        </div>`;
-            var myobj = document.getElementById("result");
-            myobj.innerHTML = '';
+                            </div>`;
+                var myobj = document.getElementById("result");
+                myobj.innerHTML = '';
 
-            if (chosen === 'products') {
-                document.getElementById('result').insertAdjacentHTML('afterbegin', products);
+                if (chosen === 'products') {
+                    document.getElementById('result').insertAdjacentHTML('afterbegin', products);
+                }
+                if (chosen === 'blogs') {
+                    document.getElementById('result').insertAdjacentHTML('afterbegin', blogs);
+                }
+                if (chosen === 'pages') {
+                    document.getElementById('result').insertAdjacentHTML('afterbegin', pages);
+                }
+                if (chosen === 'article') {
+                    document.getElementById('result').insertAdjacentHTML('afterbegin', article);
+                }
             }
-            if (chosen === 'blogs') {
-                document.getElementById('result').insertAdjacentHTML('afterbegin', blogs);
+        function myOption(chosen) {
+            var option = document.getElementsByName("options-value");
+            // console.log(option.getAttribute('data-value'));
+            for( i = 0; i < option.length; i++ ) {
+                //console.log();
+                if (option[i].getAttribute('data-value') == chosen.getAttribute('data-key')) {
+                    option[i].classList.remove('option');
+                    option[i].classList.add('open');
+                } else {
+                    option[i].classList.remove('open');
+                    option[i].classList.add('option');
+                }
             }
-            if (chosen === 'pages') {
-                document.getElementById('result').insertAdjacentHTML('afterbegin', pages);
-            }
-            if (chosen === 'article') {
-                document.getElementById('result').insertAdjacentHTML('afterbegin', article);
-            }
+            
         }
-        
     </script>
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
