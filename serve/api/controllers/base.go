@@ -56,6 +56,9 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/home", a.HomePageGet).Methods("GET")
 	a.Router.HandleFunc("/home", a.HomePagePost).Methods("POST")
 
+	//product
+	a.Router.HandleFunc("/product", a.ProductsPageGet).Methods("GET")
+
 }
 
 // RunServer export
