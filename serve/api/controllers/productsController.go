@@ -115,11 +115,14 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 	var data Product
 	json.Unmarshal(body, &data)
 
-	variantsData := []interface{}{}
-
 	for i := 0; i < len(data); i++ {
+
+		variantsData := []interface{}{}
+		optionsData := []interface{}{}
+		imgData := []interface{}{}
+
 		//check data Atribute nếu khác rỗng. thì duyệt
-		if data[i].Variations != nil {
+		if len(data[i].Variations) > 0 {
 			for i1 := 0; i1 < len(data[i].Variations); i1++ {
 				url1 := "http://dev.local/wp-json/wc/v3/products/" + strconv.Itoa(data[i].ID) + "/variations/" + strconv.Itoa(data[i].Variations[i1])
 
@@ -141,9 +144,24 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 				variantsData = append(variantsData, varData)
 			}
 
+		} else {
+			price := data[i].Price
+			salePrice := data[i].SalePrice
+			i1, err := strconv.Atoi(price)
+			i2, err1 := strconv.Atoi(salePrice)
+			if err == nil && err1 == nil && i1 <= i2 {
+				salePrice = ""
+			}
+
+			varData := map[string]interface{}{
+				"option1":          data[i].Name,
+				"price":            data[i].Price,
+				"compare_at_price": salePrice,
+				"sku":              data[i].Sku,
+			}
+
+			variantsData = append(variantsData, varData)
 		}
-		optionsData := []interface{}{}
-		imgData := []interface{}{}
 
 		if data[i].Images != nil {
 			for i2 := 0; i2 < len(data[i].Images); i2++ {
@@ -165,11 +183,9 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 				"options":     optionsData,
 				"images":      imgData,
 				"image":       "",
-				"price":       data[i].Price,
-				"sale_price":  data[i].SalePrice,
-				"sku":         data[i].Sku,
 			},
 		}
+
 		url2 := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/products.json"
 
 		checkValueRequest(values, url2)
