@@ -109,7 +109,7 @@ type Product []struct {
 
 //ProductsPageGet in function
 func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
-	url := "http://dev.local/wp-json/wc/v3/products"
+	url := "http://dev.local/wp-json/wc/v3/products/?per_page=16"
 
 	body := sendRequest(url)
 	var data Product
@@ -120,8 +120,9 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 		variantsData := []interface{}{}
 		optionsData := []interface{}{}
 		imgData := []interface{}{}
+		tagsData := []interface{}{}
 
-		//check data Atribute nếu khác rỗng. thì duyệt
+		//check data Variations nếu khác rỗng. thì duyệt
 		if len(data[i].Variations) > 0 {
 			for i1 := 0; i1 < len(data[i].Variations); i1++ {
 				url1 := "http://dev.local/wp-json/wc/v3/products/" + strconv.Itoa(data[i].ID) + "/variations/" + strconv.Itoa(data[i].Variations[i1])
@@ -149,7 +150,7 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 			salePrice := data[i].SalePrice
 			i1, err := strconv.Atoi(price)
 			i2, err1 := strconv.Atoi(salePrice)
-			if err == nil && err1 == nil && i1 <= i2 {
+			if err == nil && err1 == nil && i1 >= i2 {
 				salePrice = ""
 			}
 
@@ -173,6 +174,15 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
+		if len(data[i].Tags) > 0 {
+			for i3 := 0; i3 < len(data[i].Tags); i3++ {
+				tags := []interface{}{
+					data[i].Tags[i3],
+				}
+				tagsData = append(tagsData, tags)
+			}
+		}
+
 		values := map[string]map[string]interface{}{
 			"product": {
 				"title":       data[i].Name,
@@ -183,9 +193,11 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 				"options":     optionsData,
 				"images":      imgData,
 				"image":       "",
+				"tags":        tagsData,
 			},
 		}
-
+		// jsonValue, _ := json.Marshal(values)
+		// fmt.Println(bytes.NewBuffer(jsonValue))
 		url2 := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/products.json"
 
 		checkValueRequest(values, url2)
