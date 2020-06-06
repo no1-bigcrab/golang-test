@@ -11,7 +11,7 @@ import (
 )
 
 //Product is
-type Product struct {
+type Product []struct {
 	Links struct {
 		Collection []struct {
 			Href string `json:"href"`
@@ -109,68 +109,71 @@ type Product struct {
 
 //ProductsPageGet in function
 func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
-	url := "http://dev.local/wp-json/wc/v3/products/12"
+	url := "http://dev.local/wp-json/wc/v3/products"
 
 	body := sendRequest(url)
 	var data Product
 	json.Unmarshal(body, &data)
 
-	//for i := 0; i < len(data); i++ {
-
-	//check data Atribute nếu khác rỗng. thì duyệt
 	variantsData := []interface{}{}
 
-	for i := 0; i < len(data.Variations); i++ {
-		//nên tạo 1 function call api.có các trường có thể nhập vàofor k,v := range {
-		url1 := "http://dev.local/wp-json/wc/v3/products/12" + "/variations/" + strconv.Itoa(data.Variations[i])
+	for i := 0; i < len(data); i++ {
+		//check data Atribute nếu khác rỗng. thì duyệt
+		if data[i].Variations != nil {
+			for i1 := 0; i1 < len(data[i].Variations); i1++ {
+				url1 := "http://dev.local/wp-json/wc/v3/products/" + strconv.Itoa(data[i].ID) + "/variations/" + strconv.Itoa(data[i].Variations[i1])
 
-		body1 := sendRequest(url1)
-		var data1 models.Products
-		json.Unmarshal(body1, &data1)
-		// jsonValue, _ := json.Marshal(data1)
-		// fmt.Println(bytes.NewBuffer(jsonValue))
-		dataAttr := map[string]interface{}{
-			"id":  data.Variations[i],
-			"src": data1.Image.Src,
+				body1 := sendRequest(url1)
+				var data1 models.Products
+				json.Unmarshal(body1, &data1)
+
+				dataAttr := map[string]interface{}{
+					"id":  data[i].Variations[i],
+					"src": data1.Image.Src,
+				}
+				varData := map[string]interface{}{
+					"option1": data1.Attributes[0].Option,
+					"price":   data1.Price,
+					"sku":     data1.Sku,
+					"image":   dataAttr,
+				}
+
+				variantsData = append(variantsData, varData)
+			}
+
 		}
-		varData := map[string]interface{}{
-			"option1": data1.Attributes[0].Option,
-			"price":   data1.Price,
-			"sku":     data1.Sku,
-			"image":   dataAttr,
+		optionsData := []interface{}{}
+		imgData := []interface{}{}
+
+		if data[i].Images != nil {
+			for i2 := 0; i2 < len(data[i].Images); i2++ {
+				dataImage := map[string]string{
+					"alt": "",
+					"src": data[i].Images[i2].Src,
+				}
+				imgData = append(imgData, dataImage)
+			}
 		}
 
-		variantsData = append(variantsData, varData)
-	}
-
-	optionsData := []interface{}{}
-	imgData := []interface{}{}
-
-	for i := 0; i < len(data.Images); i++ {
-		dataImage := map[string]string{
-			"alt": "",
-			"src": data.Images[i].Src,
+		values := map[string]map[string]interface{}{
+			"product": {
+				"title":       data[i].Name,
+				"body_html":   data[i].Description,
+				"vendor":      "",
+				"productType": "",
+				"variants":    variantsData,
+				"options":     optionsData,
+				"images":      imgData,
+				"image":       "",
+				"price":       data[i].Price,
+				"sale_price":  data[i].SalePrice,
+				"sku":         data[i].Sku,
+			},
 		}
-		imgData = append(imgData, dataImage)
-	}
+		url2 := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/products.json"
 
-	values := map[string]map[string]interface{}{
-		"product": {
-			"title":       data.Name,
-			"body_html":   data.Description,
-			"vendor":      "",
-			"productType": "",
-			"variants":    variantsData,
-			"options":     optionsData,
-			"images":      imgData,
-			"image":       "",
-		},
+		checkValueRequest(values, url2)
 	}
-	jsonValue, _ := json.Marshal(values)
-	fmt.Println(bytes.NewBuffer(jsonValue))
-	url2 := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/products.json"
-
-	checkValueRequest(values, url2)
 }
 func checkValue(values map[string]map[string]interface{}, url string) {
 
