@@ -111,9 +111,11 @@ type Product []struct {
 func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 	url := "http://dev.local/wp-json/wc/v3/products/?per_page=16"
 
-	body := sendRequest(url)
+	body := getValueFromWp(url)
 	var data Product
 	json.Unmarshal(body, &data)
+	// jsonValue, _ := json.Marshal(data)
+	// fmt.Println(bytes.NewBuffer(jsonValue))
 
 	for i := 0; i < len(data); i++ {
 
@@ -121,13 +123,14 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 		optionsData := []interface{}{}
 		imgData := []interface{}{}
 		tagsData := []interface{}{}
+		collectData := []interface{}{}
 
 		//check data Variations nếu khác rỗng. thì duyệt
 		if len(data[i].Variations) > 0 {
 			for i1 := 0; i1 < len(data[i].Variations); i1++ {
 				url1 := "http://dev.local/wp-json/wc/v3/products/" + strconv.Itoa(data[i].ID) + "/variations/" + strconv.Itoa(data[i].Variations[i1])
 
-				body1 := sendRequest(url1)
+				body1 := getValueFromWp(url1)
 				var data1 models.Products
 				json.Unmarshal(body1, &data1)
 
@@ -182,28 +185,41 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 				tagsData = append(tagsData, tags)
 			}
 		}
+		if len(data[i].Categories) > 0 {
+			for i4 := 0; i4 < len(data[i].Categories); i4++ {
+				dataCategory := data[i].Categories[i4]
+				createCollection(dataCategory.Name)
+				// urlCollection := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/custom_collections.json"
+				// getValueFromStore(urlCollection)
+				// var dataCollection models.Collection
+				// json.Unmarshal(collection, &dataCollection)
+				// fmt.Println(dataCollection)
+
+			}
+		}
 
 		values := map[string]map[string]interface{}{
 			"product": {
-				"title":       data[i].Name,
-				"body_html":   data[i].Description,
-				"vendor":      "",
-				"productType": "",
-				"variants":    variantsData,
-				"options":     optionsData,
-				"images":      imgData,
-				"image":       "",
-				"tags":        tagsData,
+				"title":         data[i].Name,
+				"body_html":     data[i].Description,
+				"vendor":        "",
+				"productType":   "",
+				"variants":      variantsData,
+				"options":       optionsData,
+				"images":        imgData,
+				"image":         "",
+				"tags":          tagsData,
+				"collection_id": collectData,
 			},
 		}
-		// jsonValue, _ := json.Marshal(values)
-		// fmt.Println(bytes.NewBuffer(jsonValue))
-		url2 := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/products.json"
+		jsonValue, _ := json.Marshal(values)
+		fmt.Println(bytes.NewBuffer(jsonValue))
+		// url2 := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/products.json"
 
-		checkValueRequest(values, url2)
+		// postValueToStore(values, url2)
 	}
 }
-func checkValue(values map[string]map[string]interface{}, url string) {
+func postValueToStore(values map[string]map[string]interface{}, url string) {
 
 	jsonValue, _ := json.Marshal(values)
 	//fmt.Println(bytes.NewBuffer(jsonValue))
@@ -220,12 +236,62 @@ func checkValue(values map[string]map[string]interface{}, url string) {
 	fmt.Println("response Status:", resp.Status)
 }
 
-func sendRequest(url string) []byte {
+func getValueFromWp(url string) []byte {
 	token1 := "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9kZXYubG9jYWwiLCJpYXQiOjE1OTEyNTYxMTksIm5iZiI6MTU5MTI1NjExOSwiZXhwIjoxNTkxODYwOTE5LCJkYXRhIjp7InVzZXIiOnsiaWQiOjEsInR5cGUiOiJ3cF91c2VyIiwidXNlcl9sb2dpbiI6ImFkbWluIiwidXNlcl9lbWFpbCI6ImRldi1lbWFpbEBmbHl3aGVlbC5sb2NhbCIsImFwaV9rZXkiOiIxaUoxNHJydmFjbEZCTjVBSmpiMUpDa2ZFIn19fQ.2Pmo5DefSc69txjGtAJX8zwU7Oxw9rS_V7_wm5ARiYg"
 
 	r, err1 := http.NewRequest("GET", url, nil)
 	r.Header.Set("Content-Type", "application/json")
 	r.Header.Set("Authorization", "Bearer "+token1)
+	client1 := &http.Client{}
+	resp1, err1 := client1.Do(r)
+	if err1 != nil {
+		panic(err1)
+	}
+	defer resp1.Body.Close()
+	body1, _ := ioutil.ReadAll(resp1.Body)
+
+	return body1
+}
+
+func createCollection(nameCollection string) {
+	urlCollection := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/custom_collections.json"
+	req, err := http.NewRequest("GET", urlCollection, nil)
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	fmt.Println("response Status:", resp.Status)
+	body, _ := ioutil.ReadAll(resp.Body)
+	var collected models.Collection
+	json.Unmarshal(body, &collected)
+	fmt.Println(collected)
+	// if len(data1) == 0 {
+	// 	valCategoies := map[string]map[string]interface{}{
+	// 		"custom_collection": {
+	// 			"title": nameCollection,
+	// 		},
+	// 	}
+	// 	postValueToStore(valCategoies, url4)
+	// } else {
+	// 	for i := 0; i < len(data1); i++ {
+	// 		if data1[i].Title != nameCollection {
+	// 			valCategoies := map[string]map[string]interface{}{
+	// 				"custom_collection": {
+	// 					"title": nameCollection,
+	// 				},
+	// 			}
+	// 			postValueToStore(valCategoies, url4)
+	// 		}
+	// 	}
+	// }
+
+}
+func getValueFromStore(url string) []byte {
+	r, err1 := http.NewRequest("GET", url, nil)
+	r.Header.Set("Content-Type", "application/json")
 	client1 := &http.Client{}
 	resp1, err1 := client1.Do(r)
 	if err1 != nil {
