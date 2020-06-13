@@ -107,6 +107,20 @@ type Product []struct {
 	Weight           string        `json:"weight"`
 }
 
+//CustomCollections is
+type CustomCollections []struct {
+	ID                int64       `json:"id"`
+	Handle            string      `json:"handle"`
+	Title             string      `json:"title"`
+	UpdatedAt         string      `json:"updated_at"`
+	BodyHTML          interface{} `json:"body_html"`
+	PublishedAt       string      `json:"published_at"`
+	SortOrder         string      `json:"sort_order"`
+	TemplateSuffix    interface{} `json:"template_suffix"`
+	PublishedScope    string      `json:"published_scope"`
+	AdminGraphqlAPIID string      `json:"admin_graphql_api_id"`
+}
+
 //ProductsPageGet in function
 func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 	url := "http://dev.local/wp-json/wc/v3/products/?per_page=16"
@@ -123,7 +137,7 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 		optionsData := []interface{}{}
 		imgData := []interface{}{}
 		tagsData := []interface{}{}
-		collectData := []interface{}{}
+		collectData := []string{}
 
 		//check data Variations nếu khác rỗng. thì duyệt
 		if len(data[i].Variations) > 0 {
@@ -189,14 +203,11 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 			for i4 := 0; i4 < len(data[i].Categories); i4++ {
 				dataCategory := data[i].Categories[i4]
 				createCollection(dataCategory.Name)
-				// urlCollection := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/custom_collections.json"
-				// getValueFromStore(urlCollection)
-				// var dataCollection models.Collection
-				// json.Unmarshal(collection, &dataCollection)
-				// fmt.Println(dataCollection)
-
+				//fmt.Println(dataID)
+				collectData = append(collectData, dataCategory.Name)
 			}
 		}
+		//fmt.Println(collectData)
 
 		values := map[string]map[string]interface{}{
 			"product": {
@@ -212,11 +223,11 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 				"collection_id": collectData,
 			},
 		}
-		jsonValue, _ := json.Marshal(values)
-		fmt.Println(bytes.NewBuffer(jsonValue))
-		// url2 := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/products.json"
+		// jsonValue, _ := json.Marshal(values)
+		// fmt.Println(bytes.NewBuffer(jsonValue))
+		url2 := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/products.json"
 
-		// postValueToStore(values, url2)
+		postValueToStore(values, url2)
 	}
 }
 func postValueToStore(values map[string]map[string]interface{}, url string) {
@@ -237,7 +248,7 @@ func postValueToStore(values map[string]map[string]interface{}, url string) {
 }
 
 func getValueFromWp(url string) []byte {
-	token1 := "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9kZXYubG9jYWwiLCJpYXQiOjE1OTEyNTYxMTksIm5iZiI6MTU5MTI1NjExOSwiZXhwIjoxNTkxODYwOTE5LCJkYXRhIjp7InVzZXIiOnsiaWQiOjEsInR5cGUiOiJ3cF91c2VyIiwidXNlcl9sb2dpbiI6ImFkbWluIiwidXNlcl9lbWFpbCI6ImRldi1lbWFpbEBmbHl3aGVlbC5sb2NhbCIsImFwaV9rZXkiOiIxaUoxNHJydmFjbEZCTjVBSmpiMUpDa2ZFIn19fQ.2Pmo5DefSc69txjGtAJX8zwU7Oxw9rS_V7_wm5ARiYg"
+	token1 := "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9kZXYubG9jYWwiLCJpYXQiOjE1OTE5MzI0MDIsIm5iZiI6MTU5MTkzMjQwMiwiZXhwIjoxNTkyNTM3MjAyLCJkYXRhIjp7InVzZXIiOnsiaWQiOjEsInR5cGUiOiJ3cF91c2VyIiwidXNlcl9sb2dpbiI6ImFkbWluIiwidXNlcl9lbWFpbCI6ImRldi1lbWFpbEBmbHl3aGVlbC5sb2NhbCIsImFwaV9rZXkiOiIxQWZCZXlvU0U1a3Axa2lDMDNaYjJpSURZIn19fQ.5ls54WhX6GDPeMbPTOoVF_aqUqwg7OnkxjXn9qowNR8"
 
 	r, err1 := http.NewRequest("GET", url, nil)
 	r.Header.Set("Content-Type", "application/json")
@@ -248,47 +259,44 @@ func getValueFromWp(url string) []byte {
 		panic(err1)
 	}
 	defer resp1.Body.Close()
-	body1, _ := ioutil.ReadAll(resp1.Body)
+	body, _ := ioutil.ReadAll(resp1.Body)
 
-	return body1
+	return body
 }
 
 func createCollection(nameCollection string) {
-	urlCollection := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/custom_collections.json"
-	req, err := http.NewRequest("GET", urlCollection, nil)
-	req.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		panic(err)
+	url := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/custom_collections.json"
+
+	urlCollection := url + "?title=" + nameCollection
+	body := getValueFromStore(urlCollection)
+
+	var data struct {
+		CustomCollections CustomCollections `json:"custom_collections"`
 	}
-	defer resp.Body.Close()
-	fmt.Println("response Status:", resp.Status)
-	body, _ := ioutil.ReadAll(resp.Body)
-	var collected models.Collection
-	json.Unmarshal(body, &collected)
-	fmt.Println(collected)
-	// if len(data1) == 0 {
-	// 	valCategoies := map[string]map[string]interface{}{
-	// 		"custom_collection": {
-	// 			"title": nameCollection,
-	// 		},
-	// 	}
-	// 	postValueToStore(valCategoies, url4)
-	// } else {
-	// 	for i := 0; i < len(data1); i++ {
-	// 		if data1[i].Title != nameCollection {
-	// 			valCategoies := map[string]map[string]interface{}{
-	// 				"custom_collection": {
-	// 					"title": nameCollection,
-	// 				},
-	// 			}
-	// 			postValueToStore(valCategoies, url4)
-	// 		}
-	// 	}
-	// }
+	// dataCollection
+
+	json.Unmarshal(body, &data)
+
+	if len(data.CustomCollections) == 0 {
+		valCategoies := map[string]map[string]interface{}{
+			"custom_collection": {
+				"title": nameCollection,
+			},
+		}
+		postValueToStore(valCategoies, url)
+		// bodyCollection := getValueFromStore(urlCollection)
+
+		// var dataCollection struct {
+		// 	CustomCollections CustomCollections `json:"custom_collections"`
+		// } // dataCollection
+
+		// json.Unmarshal(bodyCollection, &dataCollection)
+		// collectionID = strconv.FormatInt(dataCollection.CustomCollections[0].ID, 10)
+
+	}
 
 }
+
 func getValueFromStore(url string) []byte {
 	r, err1 := http.NewRequest("GET", url, nil)
 	r.Header.Set("Content-Type", "application/json")
@@ -298,7 +306,7 @@ func getValueFromStore(url string) []byte {
 		panic(err1)
 	}
 	defer resp1.Body.Close()
-	body1, _ := ioutil.ReadAll(resp1.Body)
+	body, _ := ioutil.ReadAll(resp1.Body)
 
-	return body1
+	return body
 }
