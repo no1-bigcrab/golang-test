@@ -226,8 +226,14 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 		// jsonValue, _ := json.Marshal(values)
 		// fmt.Println(bytes.NewBuffer(jsonValue))
 		url2 := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/products.json"
+		urlProducts := url2 + "?title=" + data[i].Name
+		bodyProducts := getValueFromStore(urlProducts)
 
-		postValueToStore(values, url2)
+		//fmt.Println(bodyProducts)
+		if len(bodyProducts) == 0 {
+			postValueToStore(values, url2)
+		}
+
 	}
 }
 func postValueToStore(values map[string]map[string]interface{}, url string) {
