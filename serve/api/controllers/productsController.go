@@ -276,29 +276,20 @@ func createCollection(nameCollection string) {
 	urlCollection := url + "?title=" + nameCollection
 	body := getValueFromStore(urlCollection)
 
-	var data struct {
-		CustomCollections CustomCollections `json:"custom_collections"`
-	}
-	// dataCollection
+	// var data struct {
+	// 	CustomCollections CustomCollections `json:"custom_collections"`
+	// }
+	// // dataCollection
 
-	json.Unmarshal(body, &data)
+	// json.Unmarshal(body, &data)
 
-	if len(data.CustomCollections) == 0 {
+	if len(body) == 0 {
 		valCategoies := map[string]map[string]interface{}{
 			"custom_collection": {
 				"title": nameCollection,
 			},
 		}
 		postValueToStore(valCategoies, url)
-		// bodyCollection := getValueFromStore(urlCollection)
-
-		// var dataCollection struct {
-		// 	CustomCollections CustomCollections `json:"custom_collections"`
-		// } // dataCollection
-
-		// json.Unmarshal(bodyCollection, &dataCollection)
-		// collectionID = strconv.FormatInt(dataCollection.CustomCollections[0].ID, 10)
-
 	}
 
 }
