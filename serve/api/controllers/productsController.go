@@ -137,7 +137,7 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 		optionsData := []interface{}{}
 		imgData := []interface{}{}
 		tagsData := []interface{}{}
-		collectData := []string{}
+		var collectData string
 
 		//check data Variations nếu khác rỗng. thì duyệt
 		if len(data[i].Variations) > 0 {
@@ -202,25 +202,24 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 		if len(data[i].Categories) > 0 {
 			for i4 := 0; i4 < len(data[i].Categories); i4++ {
 				dataCategory := data[i].Categories[i4]
-				createCollection(dataCategory.Name)
+				IDCollection := createCollection(dataCategory.Name)
 				//fmt.Println(dataID)
-				collectData = append(collectData, dataCategory.Name)
+				collectData = strconv.FormatInt(IDCollection, 10)
 			}
 		}
 		//fmt.Println(collectData)
 
 		values := map[string]map[string]interface{}{
 			"product": {
-				"title":         data[i].Name,
-				"body_html":     data[i].Description,
-				"vendor":        "",
-				"productType":   "",
-				"variants":      variantsData,
-				"options":       optionsData,
-				"images":        imgData,
-				"image":         "",
-				"tags":          tagsData,
-				"collection_id": collectData,
+				"title":       data[i].Name,
+				"body_html":   data[i].Description,
+				"vendor":      "",
+				"productType": "",
+				"variants":    variantsData,
+				"options":     optionsData,
+				"images":      imgData,
+				"image":       "",
+				"tags":        tagsData,
 			},
 		}
 		// jsonValue, _ := json.Marshal(values)
@@ -229,11 +228,28 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 		urlProducts := url2 + "?title=" + data[i].Name
 		bodyProducts := getValueFromStore(urlProducts)
 
-		//fmt.Println(bodyProducts)
-		if len(bodyProducts) == 0 {
-			postValueToStore(values, url2)
+		var productCheck struct {
+			Products Product `json:"products"`
 		}
 
+		json.Unmarshal(bodyProducts, &productCheck)
+
+		if len(productCheck.Products) != 0 {
+			for i5 := 0; i5 < len(productCheck.Products); i5++ {
+				IDProduct := productCheck.Products[i5].ID
+
+				valuesProduct := map[string]map[string]interface{}{
+					"collect": {
+						"product_id":    IDProduct,
+						"collection_id": collectData,
+					},
+				}
+				urlColection := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/collects.json"
+				postValueToStore(valuesProduct, urlColection)
+			}
+		} else {
+			postValueToStore(values, url2)
+		}
 	}
 }
 func postValueToStore(values map[string]map[string]interface{}, url string) {
@@ -270,27 +286,42 @@ func getValueFromWp(url string) []byte {
 	return body
 }
 
-func createCollection(nameCollection string) {
+func createCollection(nameCollection string) int64 {
 	url := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/custom_collections.json"
 
 	urlCollection := url + "?title=" + nameCollection
 	body := getValueFromStore(urlCollection)
 
-	// var data struct {
-	// 	CustomCollections CustomCollections `json:"custom_collections"`
-	// }
-	// // dataCollection
+	var data struct {
+		CustomCollections CustomCollections `json:"custom_collections"`
+	}
+	// dataCollection
 
-	// json.Unmarshal(body, &data)
+	json.Unmarshal(body, &data)
 
-	if len(body) == 0 {
+	var IDCollection int64
+	if len(data.CustomCollections) == 0 {
 		valCategoies := map[string]map[string]interface{}{
 			"custom_collection": {
 				"title": nameCollection,
 			},
 		}
 		postValueToStore(valCategoies, url)
+		urlCollectionCreateNew := url + "?title=" + nameCollection
+		bodyCollection := getValueFromStore(urlCollectionCreateNew)
+
+		var dataCollectionCreateNew struct {
+			CustomCollections CustomCollections `json:"custom_collections"`
+		}
+		json.Unmarshal(bodyCollection, &dataCollectionCreateNew)
+
+		IDCollection = dataCollectionCreateNew.CustomCollections[0].ID
+
+	} else {
+		IDCollection = data.CustomCollections[0].ID
 	}
+
+	return IDCollection
 
 }
 
