@@ -140,7 +140,6 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 				imgData := []interface{}{}
 				tagsData := []interface{}{}
 				var collectData string
-
 				//check data Variations nếu khác rỗng. thì duyệt
 				if len(data[i].Variations) > 0 {
 					for i1 := 0; i1 < len(data[i].Variations); i1++ {
@@ -172,14 +171,12 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 					if err == nil && err1 == nil && i1 >= i2 {
 						salePrice = ""
 					}
-
 					varData := map[string]interface{}{
 						"option1":          data[i].Name,
 						"price":            data[i].Price,
 						"compare_at_price": salePrice,
 						"sku":              data[i].Sku,
 					}
-
 					variantsData = append(variantsData, varData)
 				}
 
@@ -205,12 +202,10 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 					for i4 := 0; i4 < len(data[i].Categories); i4++ {
 						dataCategory := data[i].Categories[i4]
 						IDCollection := createCollection(dataCategory.Name)
-						//fmt.Println(dataID)
 						collectData = strconv.FormatInt(IDCollection, 10)
 					}
 				}
 				//fmt.Println(collectData)
-
 				values := map[string]map[string]interface{}{
 					"product": {
 						"title":       data[i].Name,
@@ -240,7 +235,6 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 				if len(productCheck.Products) != 0 {
 					for i5 := 0; i5 < len(productCheck.Products); i5++ {
 						IDProduct := productCheck.Products[i5].ID
-
 						valuesProduct := map[string]map[string]interface{}{
 							"collect": {
 								"product_id":    IDProduct,
@@ -254,7 +248,6 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 					postValueToStore(values, url2)
 
 					bodyProducts := getValueFromStore(urlProducts)
-
 					json.Unmarshal(bodyProducts, &productCheck)
 
 					if len(productCheck.Products) != 0 {
