@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 //Product is
@@ -123,7 +124,7 @@ type CustomCollections []struct {
 
 //ProductsPageGet in function
 func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
-	url := "http://dev.local/wp-json/wc/v3/products/?per_page=16"
+	url := "http://dev.local/wp-json/wc/v3/products"
 
 	body := getValueFromWp(url)
 	var data Product
@@ -225,7 +226,8 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 		// jsonValue, _ := json.Marshal(values)
 		// fmt.Println(bytes.NewBuffer(jsonValue))
 		url2 := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/products.json"
-		urlProducts := url2 + "?title=" + data[i].Name
+		nameProduct := strings.ReplaceAll(data[i].Name, " ", "%20")
+		urlProducts := url2 + "?title=" + nameProduct
 		bodyProducts := getValueFromStore(urlProducts)
 
 		var productCheck struct {
@@ -272,11 +274,11 @@ func postValueToStore(values map[string]map[string]interface{}, url string) {
 func getValueFromWp(url string) []byte {
 	token1 := "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9kZXYubG9jYWwiLCJpYXQiOjE1OTE5MzI0MDIsIm5iZiI6MTU5MTkzMjQwMiwiZXhwIjoxNTkyNTM3MjAyLCJkYXRhIjp7InVzZXIiOnsiaWQiOjEsInR5cGUiOiJ3cF91c2VyIiwidXNlcl9sb2dpbiI6ImFkbWluIiwidXNlcl9lbWFpbCI6ImRldi1lbWFpbEBmbHl3aGVlbC5sb2NhbCIsImFwaV9rZXkiOiIxQWZCZXlvU0U1a3Axa2lDMDNaYjJpSURZIn19fQ.5ls54WhX6GDPeMbPTOoVF_aqUqwg7OnkxjXn9qowNR8"
 
-	r, err1 := http.NewRequest("GET", url, nil)
-	r.Header.Set("Content-Type", "application/json")
-	r.Header.Set("Authorization", "Bearer "+token1)
+	res, err1 := http.NewRequest("GET", url, nil)
+	res.Header.Set("Content-Type", "application/json")
+	res.Header.Set("Authorization", "Bearer "+token1)
 	client1 := &http.Client{}
-	resp1, err1 := client1.Do(r)
+	resp1, err1 := client1.Do(res)
 	if err1 != nil {
 		panic(err1)
 	}
@@ -286,9 +288,9 @@ func getValueFromWp(url string) []byte {
 	return body
 }
 
-func createCollection(nameCollection string) int64 {
+func createCollection(Collection string) int64 {
 	url := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/custom_collections.json"
-
+	nameCollection := strings.ReplaceAll(Collection, " ", "%20")
 	urlCollection := url + "?title=" + nameCollection
 	body := getValueFromStore(urlCollection)
 
