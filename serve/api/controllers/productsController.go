@@ -124,135 +124,158 @@ type CustomCollections []struct {
 
 //ProductsPageGet in function
 func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
-	url := "http://dev.local/wp-json/wc/v3/products"
+	for count := 1; count < 20; count++ {
+		url := "http://dev.local/wp-json/wc/v3/products/?page=" + strconv.Itoa(count)
 
-	body := getValueFromWp(url)
-	var data Product
-	json.Unmarshal(body, &data)
-	// jsonValue, _ := json.Marshal(data)
-	// fmt.Println(bytes.NewBuffer(jsonValue))
-
-	for i := 0; i < len(data); i++ {
-
-		variantsData := []interface{}{}
-		optionsData := []interface{}{}
-		imgData := []interface{}{}
-		tagsData := []interface{}{}
-		var collectData string
-
-		//check data Variations nếu khác rỗng. thì duyệt
-		if len(data[i].Variations) > 0 {
-			for i1 := 0; i1 < len(data[i].Variations); i1++ {
-				url1 := "http://dev.local/wp-json/wc/v3/products/" + strconv.Itoa(data[i].ID) + "/variations/" + strconv.Itoa(data[i].Variations[i1])
-
-				body1 := getValueFromWp(url1)
-				var data1 models.Products
-				json.Unmarshal(body1, &data1)
-
-				dataAttr := map[string]interface{}{
-					"id":  data[i].Variations[i],
-					"src": data1.Image.Src,
-				}
-				varData := map[string]interface{}{
-					"option1": data1.Attributes[0].Option,
-					"price":   data1.Price,
-					"sku":     data1.Sku,
-					"image":   dataAttr,
-				}
-
-				variantsData = append(variantsData, varData)
-			}
-
-		} else {
-			price := data[i].Price
-			salePrice := data[i].SalePrice
-			i1, err := strconv.Atoi(price)
-			i2, err1 := strconv.Atoi(salePrice)
-			if err == nil && err1 == nil && i1 >= i2 {
-				salePrice = ""
-			}
-
-			varData := map[string]interface{}{
-				"option1":          data[i].Name,
-				"price":            data[i].Price,
-				"compare_at_price": salePrice,
-				"sku":              data[i].Sku,
-			}
-
-			variantsData = append(variantsData, varData)
-		}
-
-		if data[i].Images != nil {
-			for i2 := 0; i2 < len(data[i].Images); i2++ {
-				dataImage := map[string]string{
-					"alt": "",
-					"src": data[i].Images[i2].Src,
-				}
-				imgData = append(imgData, dataImage)
-			}
-		}
-
-		if len(data[i].Tags) > 0 {
-			for i3 := 0; i3 < len(data[i].Tags); i3++ {
-				tags := []interface{}{
-					data[i].Tags[i3],
-				}
-				tagsData = append(tagsData, tags)
-			}
-		}
-		if len(data[i].Categories) > 0 {
-			for i4 := 0; i4 < len(data[i].Categories); i4++ {
-				dataCategory := data[i].Categories[i4]
-				IDCollection := createCollection(dataCategory.Name)
-				//fmt.Println(dataID)
-				collectData = strconv.FormatInt(IDCollection, 10)
-			}
-		}
-		//fmt.Println(collectData)
-
-		values := map[string]map[string]interface{}{
-			"product": {
-				"title":       data[i].Name,
-				"body_html":   data[i].Description,
-				"vendor":      "",
-				"productType": "",
-				"variants":    variantsData,
-				"options":     optionsData,
-				"images":      imgData,
-				"image":       "",
-				"tags":        tagsData,
-			},
-		}
-		// jsonValue, _ := json.Marshal(values)
+		body := getValueFromWp(url)
+		var data Product
+		json.Unmarshal(body, &data)
+		// jsonValue, _ := json.Marshal(data)
 		// fmt.Println(bytes.NewBuffer(jsonValue))
-		url2 := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/products.json"
-		nameProduct := strings.ReplaceAll(data[i].Name, " ", "%20")
-		urlProducts := url2 + "?title=" + nameProduct
-		bodyProducts := getValueFromStore(urlProducts)
+		if len(data) > 0 {
+			for i := 0; i < len(data); i++ {
 
-		var productCheck struct {
-			Products Product `json:"products"`
-		}
+				variantsData := []interface{}{}
+				optionsData := []interface{}{}
+				imgData := []interface{}{}
+				tagsData := []interface{}{}
+				var collectData string
 
-		json.Unmarshal(bodyProducts, &productCheck)
+				//check data Variations nếu khác rỗng. thì duyệt
+				if len(data[i].Variations) > 0 {
+					for i1 := 0; i1 < len(data[i].Variations); i1++ {
+						url1 := "http://dev.local/wp-json/wc/v3/products/" + strconv.Itoa(data[i].ID) + "/variations/" + strconv.Itoa(data[i].Variations[i1])
 
-		if len(productCheck.Products) != 0 {
-			for i5 := 0; i5 < len(productCheck.Products); i5++ {
-				IDProduct := productCheck.Products[i5].ID
+						body1 := getValueFromWp(url1)
+						var data1 models.Products
+						json.Unmarshal(body1, &data1)
 
-				valuesProduct := map[string]map[string]interface{}{
-					"collect": {
-						"product_id":    IDProduct,
-						"collection_id": collectData,
+						dataAttr := map[string]interface{}{
+							"src": data1.Image.Src,
+						}
+
+						varData := map[string]interface{}{
+							"option1": data1.Attributes[0].Option,
+							"price":   data1.Price,
+							"sku":     data1.Sku,
+							"image":   dataAttr,
+						}
+
+						variantsData = append(variantsData, varData)
+					}
+
+				} else {
+					price := data[i].Price
+					salePrice := data[i].SalePrice
+					i1, err := strconv.Atoi(price)
+					i2, err1 := strconv.Atoi(salePrice)
+					if err == nil && err1 == nil && i1 >= i2 {
+						salePrice = ""
+					}
+
+					varData := map[string]interface{}{
+						"option1":          data[i].Name,
+						"price":            data[i].Price,
+						"compare_at_price": salePrice,
+						"sku":              data[i].Sku,
+					}
+
+					variantsData = append(variantsData, varData)
+				}
+
+				if data[i].Images != nil {
+					for i2 := 0; i2 < len(data[i].Images); i2++ {
+						dataImage := map[string]string{
+							"alt": "",
+							"src": data[i].Images[i2].Src,
+						}
+						imgData = append(imgData, dataImage)
+					}
+				}
+
+				if len(data[i].Tags) > 0 {
+					for i3 := 0; i3 < len(data[i].Tags); i3++ {
+						tags := []interface{}{
+							data[i].Tags[i3],
+						}
+						tagsData = append(tagsData, tags)
+					}
+				}
+				if len(data[i].Categories) > 0 {
+					for i4 := 0; i4 < len(data[i].Categories); i4++ {
+						dataCategory := data[i].Categories[i4]
+						IDCollection := createCollection(dataCategory.Name)
+						//fmt.Println(dataID)
+						collectData = strconv.FormatInt(IDCollection, 10)
+					}
+				}
+				//fmt.Println(collectData)
+
+				values := map[string]map[string]interface{}{
+					"product": {
+						"title":       data[i].Name,
+						"body_html":   data[i].Description,
+						"vendor":      "",
+						"productType": "",
+						"variants":    variantsData,
+						"options":     optionsData,
+						"images":      imgData,
+						"image":       "",
+						"tags":        tagsData,
 					},
 				}
-				urlColection := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/collects.json"
-				postValueToStore(valuesProduct, urlColection)
+				// jsonValue, _ := json.Marshal(values)
+				// fmt.Println(bytes.NewBuffer(jsonValue))
+				url2 := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/products.json"
+				nameProduct := strings.ReplaceAll(data[i].Name, " ", "%20")
+				urlProducts := url2 + "?title=" + nameProduct
+				bodyProducts := getValueFromStore(urlProducts)
+
+				var productCheck struct {
+					Products Product `json:"products"`
+				}
+
+				json.Unmarshal(bodyProducts, &productCheck)
+
+				if len(productCheck.Products) != 0 {
+					for i5 := 0; i5 < len(productCheck.Products); i5++ {
+						IDProduct := productCheck.Products[i5].ID
+
+						valuesProduct := map[string]map[string]interface{}{
+							"collect": {
+								"product_id":    IDProduct,
+								"collection_id": collectData,
+							},
+						}
+						urlColection := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/collects.json"
+						postValueToStore(valuesProduct, urlColection)
+					}
+				} else {
+					postValueToStore(values, url2)
+
+					bodyProducts := getValueFromStore(urlProducts)
+
+					json.Unmarshal(bodyProducts, &productCheck)
+
+					if len(productCheck.Products) != 0 {
+						for i5 := 0; i5 < len(productCheck.Products); i5++ {
+							IDProduct := productCheck.Products[i5].ID
+							valuesProduct := map[string]map[string]interface{}{
+								"collect": {
+									"product_id":    IDProduct,
+									"collection_id": collectData,
+								},
+							}
+							urlColection := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/collects.json"
+							postValueToStore(valuesProduct, urlColection)
+						}
+					}
+				}
 			}
-		} else {
-			postValueToStore(values, url2)
 		}
+
 	}
+
 }
 func postValueToStore(values map[string]map[string]interface{}, url string) {
 
