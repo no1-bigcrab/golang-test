@@ -57,21 +57,20 @@ type Products struct {
 		Key   string `json:"key"`
 		Value string `json:"value"`
 	} `json:"meta_data"`
-	OnSale          bool          `json:"on_sale"`
-	Permalink       string        `json:"permalink"`
-	Price           string        `json:"price"`
-	Purchasable     bool          `json:"purchasable"`
-	RegularPrice    string        `json:"regular_price"`
-	SalePrice       string        `json:"sale_price"`
-	ShippingClass   string        `json:"shipping_class"`
-	ShippingClassID int           `json:"shipping_class_id"`
-	Sku             string        `json:"sku"`
-	Status          string        `json:"status"`
-	StockQuantity   interface{}   `json:"stock_quantity"`
-	StockStatus     string        `json:"stock_status"`
-	Tags            []interface{} `json:"tags"`
-	TaxClass        string        `json:"tax_class"`
-	TaxStatus       string        `json:"tax_status"`
-	Virtual         bool          `json:"virtual"`
-	Weight          string        `json:"weight"`
+	OnSale          bool        `json:"on_sale"`
+	Permalink       string      `json:"permalink"`
+	Price           string      `json:"price"`
+	Purchasable     bool        `json:"purchasable"`
+	RegularPrice    string      `json:"regular_price"`
+	SalePrice       string      `json:"sale_price"`
+	ShippingClass   string      `json:"shipping_class"`
+	ShippingClassID int         `json:"shipping_class_id"`
+	Sku             string      `json:"sku"`
+	Status          string      `json:"status"`
+	StockQuantity   interface{} `json:"stock_quantity"`
+	StockStatus     string      `json:"stock_status"`
+	TaxClass        string      `json:"tax_class"`
+	TaxStatus       string      `json:"tax_status"`
+	Virtual         bool        `json:"virtual"`
+	Weight          string      `json:"weight"`
 }

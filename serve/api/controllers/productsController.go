@@ -124,7 +124,7 @@ type CustomCollections []struct {
 
 //ProductsPageGet in function
 func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
-	for count := 1; count < 20; count++ {
+	for count := 1; count < 100; count++ {
 		url := "http://dev.local/wp-json/wc/v3/products/?page=" + strconv.Itoa(count)
 
 		body := getValueFromWp(url)
@@ -148,36 +148,67 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 						body1 := getValueFromWp(url1)
 						var data1 models.Products
 						json.Unmarshal(body1, &data1)
-
 						dataAttr := map[string]interface{}{
 							"src": data1.Image.Src,
 						}
-
-						varData := map[string]interface{}{
-							"option1": data1.Attributes[0].Option,
-							"price":   data1.Price,
-							"sku":     data1.Sku,
-							"image":   dataAttr,
+						var dataPrice string
+						if len(data1.RegularPrice) > 0 {
+							dataPrice = data1.RegularPrice
+						} else {
+							dataPrice = data1.Price
 						}
+						//fmt.Println(data1)
+						if len(data1.Attributes) > 0 {
+							if len(data1.Attributes) == 2 {
+								varDatas := map[string]interface{}{
+									"option1":          data1.Attributes[0].Option,
+									"option2":          data1.Attributes[1].Option,
+									"option3":          "",
+									"price":            data1.SalePrice,
+									"sku":              data1.Sku,
+									"image":            dataAttr,
+									"compare_at_price": dataPrice,
+								}
+								variantsData = append(variantsData, varDatas)
 
-						variantsData = append(variantsData, varData)
-					}
+							} else if len(data1.Attributes) == 1 {
+								varDatas := map[string]interface{}{
+									"option1":          data1.Attributes[0].Option,
+									"option2":          "",
+									"option3":          "",
+									"price":            data1.SalePrice,
+									"sku":              data1.Sku,
+									"image":            dataAttr,
+									"compare_at_price": dataPrice,
+								}
+								variantsData = append(variantsData, varDatas)
 
-				} else {
-					price := data[i].Price
-					salePrice := data[i].SalePrice
-					i1, err := strconv.Atoi(price)
-					i2, err1 := strconv.Atoi(salePrice)
-					if err == nil && err1 == nil && i1 >= i2 {
-						salePrice = ""
+							} else if len(data1.Attributes) == 3 {
+								varDatas := map[string]interface{}{
+									"option1":          data1.Attributes[0].Option,
+									"option2":          data1.Attributes[1].Option,
+									"option3":          data1.Attributes[2].Option,
+									"price":            data1.SalePrice,
+									"sku":              data1.Sku,
+									"image":            dataAttr,
+									"compare_at_price": dataPrice,
+								}
+								variantsData = append(variantsData, varDatas)
+
+							}
+						}
 					}
-					varData := map[string]interface{}{
-						"option1":          data[i].Name,
-						"price":            data[i].Price,
-						"compare_at_price": salePrice,
-						"sku":              data[i].Sku,
+				}
+				if len(data[i].Attributes) > 1 {
+					for countAttr := 0; countAttr < len(data[i].Attributes); countAttr++ {
+						nameData := data[i].Attributes[countAttr].Name
+						valueAttr := data[i].Attributes[countAttr].Options
+						optDatas := map[string]interface{}{
+							"name":   nameData,
+							"values": valueAttr,
+						}
+						optionsData = append(optionsData, optDatas)
 					}
-					variantsData = append(variantsData, varData)
 				}
 
 				if data[i].Images != nil {
@@ -266,7 +297,6 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		}
-
 	}
 
 }
