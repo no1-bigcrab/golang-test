@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"golang-test/serve/api/urls"
 	"html/template"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -109,36 +108,16 @@ func (a *App) HomePageGet(w http.ResponseWriter, r *http.Request) {
 
 	path := urls.PathUrl()
 
-	url := "http://dev.local/wp-json/wc/v3/products"
+	// for count := 1; count < 100; count++ {
+	// 	url := "http://dev.local/wp-json/wc/v3/products/?page=" + strconv.Itoa(count)
+	// 	body := getValueFromWp(url)
+	// 	var data Product
+	// 	json.Unmarshal(body, &data)
 
-	token := "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9kZXYubG9jYWwiLCJpYXQiOjE1OTEyNTYxMTksIm5iZiI6MTU5MTI1NjExOSwiZXhwIjoxNTkxODYwOTE5LCJkYXRhIjp7InVzZXIiOnsiaWQiOjEsInR5cGUiOiJ3cF91c2VyIiwidXNlcl9sb2dpbiI6ImFkbWluIiwidXNlcl9lbWFpbCI6ImRldi1lbWFpbEBmbHl3aGVlbC5sb2NhbCIsImFwaV9rZXkiOiIxaUoxNHJydmFjbEZCTjVBSmpiMUpDa2ZFIn19fQ.2Pmo5DefSc69txjGtAJX8zwU7Oxw9rS_V7_wm5ARiYg"
-
-	req, err := http.NewRequest("GET", url, nil)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+token)
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		panic(err)
-	}
-
-	defer resp.Body.Close()
-	fmt.Println("response Status:", resp.Status)
-
-	body, _ := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	var data Products
-	err = json.Unmarshal([]byte(body), &data)
-	if err != nil {
-		panic(err)
-	}
-
+	// }
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	html := template.Must(template.ParseFiles(path.TEMPLATE_PATH + "/form.html"))
-	html.Execute(w, data)
+	html.Execute(w, r)
 }
 
 //HomePagePost is func

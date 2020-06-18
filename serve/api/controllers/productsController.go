@@ -130,8 +130,6 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 		body := getValueFromWp(url)
 		var data Product
 		json.Unmarshal(body, &data)
-		// jsonValue, _ := json.Marshal(data)
-		// fmt.Println(bytes.NewBuffer(jsonValue))
 		if len(data) > 0 {
 			for i := 0; i < len(data); i++ {
 
@@ -139,6 +137,8 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 				optionsData := []interface{}{}
 				imgData := []interface{}{}
 				tagsData := []interface{}{}
+				var dataPrice string
+				var dataRegPrice string
 				var collectData string
 				//check data Variations nếu khác rỗng. thì duyệt
 				if len(data[i].Variations) > 0 {
@@ -151,12 +151,12 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 						dataAttr := map[string]interface{}{
 							"src": data1.Image.Src,
 						}
-						var dataPrice string
-						if len(data1.RegularPrice) > 0 {
-							dataPrice = data1.RegularPrice
+						if data1.Price == data1.RegularPrice || len(data1.RegularPrice) == 0 {
+							dataRegPrice = ""
 						} else {
-							dataPrice = data1.Price
+							dataRegPrice = data1.RegularPrice
 						}
+						dataPrice = data1.Price
 						//fmt.Println(data1)
 						if len(data1.Attributes) > 0 {
 							if len(data1.Attributes) == 2 {
@@ -164,10 +164,10 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 									"option1":          data1.Attributes[0].Option,
 									"option2":          data1.Attributes[1].Option,
 									"option3":          "",
-									"price":            data1.SalePrice,
+									"price":            dataPrice,
 									"sku":              data1.Sku,
 									"image":            dataAttr,
-									"compare_at_price": dataPrice,
+									"compare_at_price": dataRegPrice,
 								}
 								variantsData = append(variantsData, varDatas)
 
@@ -176,10 +176,10 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 									"option1":          data1.Attributes[0].Option,
 									"option2":          "",
 									"option3":          "",
-									"price":            data1.SalePrice,
+									"price":            dataPrice,
 									"sku":              data1.Sku,
 									"image":            dataAttr,
-									"compare_at_price": dataPrice,
+									"compare_at_price": data1.RegularPrice,
 								}
 								variantsData = append(variantsData, varDatas)
 
@@ -188,18 +188,32 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 									"option1":          data1.Attributes[0].Option,
 									"option2":          data1.Attributes[1].Option,
 									"option3":          data1.Attributes[2].Option,
-									"price":            data1.SalePrice,
+									"price":            dataPrice,
 									"sku":              data1.Sku,
 									"image":            dataAttr,
-									"compare_at_price": dataPrice,
+									"compare_at_price": data1.RegularPrice,
 								}
 								variantsData = append(variantsData, varDatas)
 
 							}
 						}
 					}
+				} else {
+					dataPrice = data[i].Price
+					imgData = append(imgData, data[i].Images)
+					if data[i].Price == data[i].RegularPrice || len(data[i].RegularPrice) == 0 {
+						dataRegPrice = ""
+					} else {
+						dataRegPrice = data[i].RegularPrice
+					}
+					varDatas := map[string]interface{}{
+						"price":            dataPrice,
+						"sku":              data[i].Sku,
+						"compare_at_price": dataRegPrice,
+					}
+					variantsData = append(variantsData, varDatas)
 				}
-				if len(data[i].Attributes) > 1 {
+				if len(data[i].Attributes) > 0 {
 					for countAttr := 0; countAttr < len(data[i].Attributes); countAttr++ {
 						nameData := data[i].Attributes[countAttr].Name
 						valueAttr := data[i].Attributes[countAttr].Options
@@ -236,7 +250,6 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 						collectData = strconv.FormatInt(IDCollection, 10)
 					}
 				}
-				//fmt.Println(collectData)
 				values := map[string]map[string]interface{}{
 					"product": {
 						"title":       data[i].Name,
@@ -298,7 +311,6 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-
 }
 func postValueToStore(values map[string]map[string]interface{}, url string) {
 
