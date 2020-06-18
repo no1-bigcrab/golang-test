@@ -122,10 +122,15 @@ type CustomCollections []struct {
 	AdminGraphqlAPIID string      `json:"admin_graphql_api_id"`
 }
 
-//ProductsPageGet in function
-func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
+//ProductsPagePost in function
+func (a *App) ProductsPagePost(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	postURL := r.FormValue("url")
+	postDomain := r.FormValue("domain")
+	postPassword := r.FormValue("password")
+	postAPIkey := r.FormValue("apikey")
 	for count := 1; count < 100; count++ {
-		url := "http://dev.local/wp-json/wc/v3/products/?page=" + strconv.Itoa(count)
+		url := postURL + "products/?page=" + strconv.Itoa(count)
 
 		body := getValueFromWp(url)
 		var data Product
@@ -143,7 +148,7 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 				//check data Variations nếu khác rỗng. thì duyệt
 				if len(data[i].Variations) > 0 {
 					for i1 := 0; i1 < len(data[i].Variations); i1++ {
-						url1 := "http://dev.local/wp-json/wc/v3/products/" + strconv.Itoa(data[i].ID) + "/variations/" + strconv.Itoa(data[i].Variations[i1])
+						url1 := postURL + "products/" + strconv.Itoa(data[i].ID) + "/variations/" + strconv.Itoa(data[i].Variations[i1])
 
 						body1 := getValueFromWp(url1)
 						var data1 models.Products
@@ -174,12 +179,12 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 							} else if len(data1.Attributes) == 1 {
 								varDatas := map[string]interface{}{
 									"option1":          data1.Attributes[0].Option,
-									"option2":          "",
+									"option2":          "All Size",
 									"option3":          "",
 									"price":            dataPrice,
 									"sku":              data1.Sku,
 									"image":            dataAttr,
-									"compare_at_price": data1.RegularPrice,
+									"compare_at_price": dataRegPrice,
 								}
 								variantsData = append(variantsData, varDatas)
 
@@ -191,7 +196,7 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 									"price":            dataPrice,
 									"sku":              data1.Sku,
 									"image":            dataAttr,
-									"compare_at_price": data1.RegularPrice,
+									"compare_at_price": dataRegPrice,
 								}
 								variantsData = append(variantsData, varDatas)
 
@@ -246,9 +251,12 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 				if len(data[i].Categories) > 0 {
 					for i4 := 0; i4 < len(data[i].Categories); i4++ {
 						dataCategory := data[i].Categories[i4]
-						IDCollection := createCollection(dataCategory.Name)
+						IDCollection := createCollection(dataCategory.Name, postURL, postDomain, postPassword, postAPIkey)
 						collectData = strconv.FormatInt(IDCollection, 10)
 					}
+					// var collect interface{}
+					// json.Unmarshal(body, &collect)
+					// fmt.Println(collectData)
 				}
 				values := map[string]map[string]interface{}{
 					"product": {
@@ -265,7 +273,7 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 				}
 				// jsonValue, _ := json.Marshal(values)
 				// fmt.Println(bytes.NewBuffer(jsonValue))
-				url2 := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/products.json"
+				url2 := "https://" + postAPIkey + ":" + postPassword + "@" + postDomain + "/admin/api/2020-04/" + r.FormValue("api-title") + ".json"
 				nameProduct := strings.ReplaceAll(data[i].Name, " ", "%20")
 				urlProducts := url2 + "?title=" + nameProduct
 				bodyProducts := getValueFromStore(urlProducts)
@@ -285,7 +293,7 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 								"collection_id": collectData,
 							},
 						}
-						urlColection := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/collects.json"
+						urlColection := "https://" + postAPIkey + ":" + postPassword + "@" + postDomain + "/admin/api/2020-04/collects.json"
 						postValueToStore(valuesProduct, urlColection)
 					}
 				} else {
@@ -303,7 +311,7 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 									"collection_id": collectData,
 								},
 							}
-							urlColection := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/collects.json"
+							urlColection := "https://" + postAPIkey + ":" + postPassword + "@" + postDomain + "/admin/api/2020-04/collects.json"
 							postValueToStore(valuesProduct, urlColection)
 						}
 					}
@@ -312,6 +320,7 @@ func (a *App) ProductsPageGet(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+
 func postValueToStore(values map[string]map[string]interface{}, url string) {
 
 	jsonValue, _ := json.Marshal(values)
@@ -346,16 +355,15 @@ func getValueFromWp(url string) []byte {
 	return body
 }
 
-func createCollection(Collection string) int64 {
-	url := "https://c8f4666a96a5f2dce771c1c04a427308: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@bigcrab-1.myshopify.com/admin/api/2020-04/custom_collections.json"
+func createCollection(Collection string, postURL string, postDomain string, postPassword string, postAPIkey string) int64 {
+	url := "https://" + postAPIkey + ":" + postPassword + "@" + postDomain + "/admin/api/2020-04/custom_collections.json"
 	nameCollection := strings.ReplaceAll(Collection, " ", "%20")
 	urlCollection := url + "?title=" + nameCollection
 	body := getValueFromStore(urlCollection)
 
 	var data struct {
 		CustomCollections CustomCollections `json:"custom_collections"`
-	}
-	// dataCollection
+	} // dataCollection
 
 	json.Unmarshal(body, &data)
 

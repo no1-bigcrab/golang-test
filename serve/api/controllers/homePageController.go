@@ -6,101 +6,17 @@ import (
 	"fmt"
 	"golang-test/serve/api/urls"
 	"html/template"
+	"io/ioutil"
 	"net/http"
+	"os"
 )
 
-//Products ahhhu
-type Products []struct {
-	Links struct {
-		Collection []struct {
-			Href string `json:"href"`
-		} `json:"collection"`
-		Self []struct {
-			Href string `json:"href"`
-		} `json:"self"`
-	} `json:"_links"`
-	Attributes        []interface{} `json:"attributes"`
-	AverageRating     string        `json:"average_rating"`
-	Backordered       bool          `json:"backordered"`
-	Backorders        string        `json:"backorders"`
-	BackordersAllowed bool          `json:"backorders_allowed"`
-	ButtonText        string        `json:"button_text"`
-	CatalogVisibility string        `json:"catalog_visibility"`
-	Categories        []struct {
-		ID   int    `json:"id"`
-		Name string `json:"name"`
-		Slug string `json:"slug"`
-	} `json:"categories"`
-	CrossSellIds      []interface{} `json:"cross_sell_ids"`
-	DateOnSaleFrom    interface{}   `json:"date_on_sale_from"`
-	DateOnSaleFromGmt interface{}   `json:"date_on_sale_from_gmt"`
-	DateOnSaleTo      interface{}   `json:"date_on_sale_to"`
-	DateOnSaleToGmt   interface{}   `json:"date_on_sale_to_gmt"`
-	DefaultAttributes []interface{} `json:"default_attributes"`
-	Description       string        `json:"description"`
-	Dimensions        struct {
-		Height string `json:"height"`
-		Length string `json:"length"`
-		Width  string `json:"width"`
-	} `json:"dimensions"`
-	DownloadExpiry  int           `json:"download_expiry"`
-	DownloadLimit   int           `json:"download_limit"`
-	Downloadable    bool          `json:"downloadable"`
-	Downloads       []interface{} `json:"downloads"`
-	ExternalURL     string        `json:"external_url"`
-	Featured        bool          `json:"featured"`
-	GroupedProducts []interface{} `json:"grouped_products"`
-	ID              int           `json:"id"`
-	Images          []struct {
-		Alt  string `json:"alt"`
-		ID   int    `json:"id"`
-		Name string `json:"name"`
-		Src  string `json:"src"`
-	} `json:"images"`
-	ManageStock bool `json:"manage_stock"`
-	MenuOrder   int  `json:"menu_order"`
-	MetaData    []struct {
-		ID    int    `json:"id"`
-		Key   string `json:"key"`
-		Value string `json:"value"`
-	} `json:"meta_data"`
-	Name             string        `json:"name"`
-	OnSale           bool          `json:"on_sale"`
-	ParentID         int           `json:"parent_id"`
-	Permalink        string        `json:"permalink"`
-	Price            string        `json:"price"`
-	PriceHTML        string        `json:"price_html"`
-	Purchasable      bool          `json:"purchasable"`
-	PurchaseNote     string        `json:"purchase_note"`
-	RatingCount      int           `json:"rating_count"`
-	RegularPrice     string        `json:"regular_price"`
-	RelatedIds       []interface{} `json:"related_ids"`
-	ReviewsAllowed   bool          `json:"reviews_allowed"`
-	SalePrice        string        `json:"sale_price"`
-	ShippingClass    string        `json:"shipping_class"`
-	ShippingClassID  int           `json:"shipping_class_id"`
-	ShippingRequired bool          `json:"shipping_required"`
-	ShippingTaxable  bool          `json:"shipping_taxable"`
-	ShortDescription string        `json:"short_description"`
-	Sku              string        `json:"sku"`
-	Slug             string        `json:"slug"`
-	SoldIndividually bool          `json:"sold_individually"`
-	Status           string        `json:"status"`
-	StockQuantity    interface{}   `json:"stock_quantity"`
-	StockStatus      string        `json:"stock_status"`
-	Tags             []interface{} `json:"tags"`
-	TaxClass         string        `json:"tax_class"`
-	TaxStatus        string        `json:"tax_status"`
-	TotalSales       int           `json:"total_sales"`
-	Type             string        `json:"type"`
-	UpsellIds        []interface{} `json:"upsell_ids"`
-	Variations       []interface{} `json:"variations"`
-	Virtual          bool          `json:"virtual"`
-	Weight           string        `json:"weight"`
-	DateCreated      string        `json:"date_created,omitempty"`
-	DateCreatedGmt   string        `json:"date_created_gmt,omitempty"`
-	DateModified     string        `json:"date_modified,omitempty"`
-	DateModifiedGmt  string        `json:"date_modified_gmt,omitempty"`
+//DataURL in herhe
+type DataURL []struct {
+	APIKey   string `json:"apiKey"`
+	Password string `json:"password"`
+	Domain   string `json:"domain"`
+	URLGet   string `json:"urlGet"`
 }
 
 //HomePageGet in function
@@ -108,16 +24,29 @@ func (a *App) HomePageGet(w http.ResponseWriter, r *http.Request) {
 
 	path := urls.PathUrl()
 
-	// for count := 1; count < 100; count++ {
-	// 	url := "http://dev.local/wp-json/wc/v3/products/?page=" + strconv.Itoa(count)
-	// 	body := getValueFromWp(url)
-	// 	var data Product
-	// 	json.Unmarshal(body, &data)
+	jsonFile, err := os.Open(path.CONFIG_PATH + "dataConfig.json")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer jsonFile.Close()
 
-	// }
+	body, _ := ioutil.ReadAll(jsonFile)
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	var data DataURL
+	if err := json.Unmarshal([]byte(body), &data); err != nil {
+		panic(err)
+	}
+
+	if err != nil {
+		panic(err.Error())
+	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	html := template.Must(template.ParseFiles(path.TEMPLATE_PATH + "/form.html"))
-	html.Execute(w, r)
+	html.Execute(w, data)
 }
 
 //HomePagePost is func

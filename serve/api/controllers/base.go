@@ -54,10 +54,12 @@ func (a *App) initializeRoutes() {
 
 	//homepage
 	a.Router.HandleFunc("/home", a.HomePageGet).Methods("GET")
-	a.Router.HandleFunc("/home", a.HomePagePost).Methods("POST")
 
-	//product
-	a.Router.HandleFunc("/product", a.ProductsPageGet).Methods("GET")
+	//action push data
+	a.Router.HandleFunc("/products", a.ProductsPagePost).Methods("POST")
+	a.Router.HandleFunc("/blogs", a.BlogPageGet).Methods("GET")
+	a.Router.HandleFunc("/pages", a.PageGet).Methods("POST")
+	a.Router.HandleFunc("/article", a.ArticlePageGet).Methods("GET")
 
 }
 

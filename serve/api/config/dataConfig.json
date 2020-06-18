@@ -1,51 +1,32 @@
-{
-  "product":{
-    "title": "Burton Custom Freestyle 151",
-    "body_html": "<strong>Good snowboard!</strong>",
-    "vendor": "Burton",
-    "product_type": "Snowboard",
-    "variants": [
-      {
-        "option1": "Blue",
-        "option2": "155"
-      },
-      {
-        "option1": "Black",
-        "option2": "159"
-      }
-    ],
-    "options": [
-      {
-        "name": "Color",
-        "values": [
-          "Blue",
-          "Black"
-        ]
-      },
-      {
-        "name": "Size",
-        "values": [
-          "155 px",
-          "159 px"
-        ]
-      }
-    ]
-  },
-  "blogs": {"title": "Apple main blog"},
-  "pages": {
-    "title": "Warranty information",
-    "handle": "warranty-information",
-    "body_html": "<h2>Warranty</h2>\n<p>Returns accepted if we receive items <strong>30 days after purchase</strong>.</p>",
-    "author": "Shopify API"
-  },
-  "article":{
-    "title": "My new Article title",
-    "author": "John Smith",
-    "tags": "This Post, Has Been Tagged",
-    "body_html": "<h1>I like articles</h1>\n<p><strong>Yea</strong>, I like posting them through <span>REST</span>.</p>",
-    "image": {
-      "attachment": "R0lGODlhAQABAIAAAAAAAAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==\n"
-    }
-  }
-  
-}
+[
+   {
+      "apiKey": "c8f4666a96a5f2dce771c1c04a427308",
+      "password":"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",
+      "domain":"bigcrab-1.myshopify.com",
+      "urlGet":"http://dev.local/wp-json/wc/v3/"
+   },
+   {
+      "apiKey": "e771c1c04a427308c8f4666a96a5f2dc",
+      "password":"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",
+      "domain":"no-1big.myshopify.com",
+      "urlGet":"http://dev.local/wp-json/wc/v3/"
+   },
+   {
+      "apiKey": "c8f4666a96a5f2dcc8f4666a96a5f2dc",
+      "password":"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",
+      "domain":"bigcrab-no1.myshopify.com",
+      "urlGet":"http://dev.local/wp-json/wp/v2/"
+   },
+   {
+      "apiKey": "ce771c1c04a427308c8f4666a96a5f2d",
+      "password":"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",
+      "domain":"bigcrab-dev1.myshopify.com",
+      "urlGet":"http://dev.local/wp-json/wp/v2/"
+   },
+   {
+      "apiKey": "a5f2dce771c1c04a427308c8f4666a96",
+      "password":"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",
+      "domain":"bigcrab-development.myshopify.com",
+      "urlGet":"http://dev.local/wp-json/wp/v2/"
+   }
+]
