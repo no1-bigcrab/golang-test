@@ -73,39 +73,43 @@ type Product []struct {
 		Key   string `json:"key"`
 		Value string `json:"value"`
 	} `json:"meta_data"`
-	Name             string        `json:"name"`
-	OnSale           bool          `json:"on_sale"`
-	ParentID         int           `json:"parent_id"`
-	Permalink        string        `json:"permalink"`
-	Price            string        `json:"price"`
-	PriceHTML        string        `json:"price_html"`
-	Purchasable      bool          `json:"purchasable"`
-	PurchaseNote     string        `json:"purchase_note"`
-	RatingCount      int           `json:"rating_count"`
-	RegularPrice     string        `json:"regular_price"`
-	RelatedIds       []int         `json:"related_ids"`
-	ReviewsAllowed   bool          `json:"reviews_allowed"`
-	SalePrice        string        `json:"sale_price"`
-	ShippingClass    string        `json:"shipping_class"`
-	ShippingClassID  int           `json:"shipping_class_id"`
-	ShippingRequired bool          `json:"shipping_required"`
-	ShippingTaxable  bool          `json:"shipping_taxable"`
-	ShortDescription string        `json:"short_description"`
-	Sku              string        `json:"sku"`
-	Slug             string        `json:"slug"`
-	SoldIndividually bool          `json:"sold_individually"`
-	Status           string        `json:"status"`
-	StockQuantity    interface{}   `json:"stock_quantity"`
-	StockStatus      string        `json:"stock_status"`
-	Tags             []interface{} `json:"tags"`
-	TaxClass         string        `json:"tax_class"`
-	TaxStatus        string        `json:"tax_status"`
-	TotalSales       int           `json:"total_sales"`
-	Type             string        `json:"type"`
-	UpsellIds        []interface{} `json:"upsell_ids"`
-	Variations       []int         `json:"variations"`
-	Virtual          bool          `json:"virtual"`
-	Weight           string        `json:"weight"`
+	Name             string      `json:"name"`
+	OnSale           bool        `json:"on_sale"`
+	ParentID         int         `json:"parent_id"`
+	Permalink        string      `json:"permalink"`
+	Price            string      `json:"price"`
+	PriceHTML        string      `json:"price_html"`
+	Purchasable      bool        `json:"purchasable"`
+	PurchaseNote     string      `json:"purchase_note"`
+	RatingCount      int         `json:"rating_count"`
+	RegularPrice     string      `json:"regular_price"`
+	RelatedIds       []int       `json:"related_ids"`
+	ReviewsAllowed   bool        `json:"reviews_allowed"`
+	SalePrice        string      `json:"sale_price"`
+	ShippingClass    string      `json:"shipping_class"`
+	ShippingClassID  int         `json:"shipping_class_id"`
+	ShippingRequired bool        `json:"shipping_required"`
+	ShippingTaxable  bool        `json:"shipping_taxable"`
+	ShortDescription string      `json:"short_description"`
+	Sku              string      `json:"sku"`
+	Slug             string      `json:"slug"`
+	SoldIndividually bool        `json:"sold_individually"`
+	Status           string      `json:"status"`
+	StockQuantity    interface{} `json:"stock_quantity"`
+	StockStatus      string      `json:"stock_status"`
+	Tags             []struct {
+		ID   int    `json:"id"`
+		Name string `json:"name"`
+		Slug string `json:"slug"`
+	}
+	TaxClass   string        `json:"tax_class"`
+	TaxStatus  string        `json:"tax_status"`
+	TotalSales int           `json:"total_sales"`
+	Type       string        `json:"type"`
+	UpsellIds  []interface{} `json:"upsell_ids"`
+	Variations []int         `json:"variations"`
+	Virtual    bool          `json:"virtual"`
+	Weight     string        `json:"weight"`
 }
 
 //CustomCollections is
@@ -141,10 +145,10 @@ func (a *App) ProductsPagePost(w http.ResponseWriter, r *http.Request) {
 				variantsData := []interface{}{}
 				optionsData := []interface{}{}
 				imgData := []interface{}{}
-				tagsData := []interface{}{}
+				tagsData := []string{}
 				var dataPrice string
 				var dataRegPrice string
-				var collectData string
+				collectData := []interface{}{}
 				//check data Variations nếu khác rỗng. thì duyệt
 				if len(data[i].Variations) > 0 {
 					for i1 := 0; i1 < len(data[i].Variations); i1++ {
@@ -242,9 +246,8 @@ func (a *App) ProductsPagePost(w http.ResponseWriter, r *http.Request) {
 
 				if len(data[i].Tags) > 0 {
 					for i3 := 0; i3 < len(data[i].Tags); i3++ {
-						tags := []interface{}{
-							data[i].Tags[i3],
-						}
+						tags := data[i].Tags[i3].Name
+
 						tagsData = append(tagsData, tags)
 					}
 				}
@@ -252,11 +255,12 @@ func (a *App) ProductsPagePost(w http.ResponseWriter, r *http.Request) {
 					for i4 := 0; i4 < len(data[i].Categories); i4++ {
 						dataCategory := data[i].Categories[i4]
 						IDCollection := createCollection(dataCategory.Name, postURL, postDomain, postPassword, postAPIkey)
-						collectData = strconv.FormatInt(IDCollection, 10)
+						//fmt.Println(IDCollection)
+						collectData = append(collectData, strconv.FormatInt(IDCollection, 10))
 					}
 					// var collect interface{}
 					// json.Unmarshal(body, &collect)
-					// fmt.Println(collectData)
+					//fmt.Println(collectData)
 				}
 				values := map[string]map[string]interface{}{
 					"product": {
@@ -287,14 +291,16 @@ func (a *App) ProductsPagePost(w http.ResponseWriter, r *http.Request) {
 				if len(productCheck.Products) != 0 {
 					for i5 := 0; i5 < len(productCheck.Products); i5++ {
 						IDProduct := productCheck.Products[i5].ID
-						valuesProduct := map[string]map[string]interface{}{
-							"collect": {
-								"product_id":    IDProduct,
-								"collection_id": collectData,
-							},
+						for countCollectData := 0; countCollectData < len(collectData); countCollectData++ {
+							valuesProduct := map[string]map[string]interface{}{
+								"collect": {
+									"product_id":    IDProduct,
+									"collection_id": collectData[countCollectData],
+								},
+							}
+							urlColection := "https://" + postAPIkey + ":" + postPassword + "@" + postDomain + "/admin/api/2020-04/collects.json"
+							postValueToStore(valuesProduct, urlColection)
 						}
-						urlColection := "https://" + postAPIkey + ":" + postPassword + "@" + postDomain + "/admin/api/2020-04/collects.json"
-						postValueToStore(valuesProduct, urlColection)
 					}
 				} else {
 					postValueToStore(values, url2)
@@ -305,14 +311,16 @@ func (a *App) ProductsPagePost(w http.ResponseWriter, r *http.Request) {
 					if len(productCheck.Products) != 0 {
 						for i5 := 0; i5 < len(productCheck.Products); i5++ {
 							IDProduct := productCheck.Products[i5].ID
-							valuesProduct := map[string]map[string]interface{}{
-								"collect": {
-									"product_id":    IDProduct,
-									"collection_id": collectData,
-								},
+							for countCollectData := 0; countCollectData < len(collectData); countCollectData++ {
+								valuesProduct := map[string]map[string]interface{}{
+									"collect": {
+										"product_id":    IDProduct,
+										"collection_id": collectData[countCollectData],
+									},
+								}
+								urlColection := "https://" + postAPIkey + ":" + postPassword + "@" + postDomain + "/admin/api/2020-04/collects.json"
+								postValueToStore(valuesProduct, urlColection)
 							}
-							urlColection := "https://" + postAPIkey + ":" + postPassword + "@" + postDomain + "/admin/api/2020-04/collects.json"
-							postValueToStore(valuesProduct, urlColection)
 						}
 					}
 				}
