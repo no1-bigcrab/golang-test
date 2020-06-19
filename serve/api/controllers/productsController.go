@@ -166,7 +166,7 @@ func (a *App) ProductsPagePost(w http.ResponseWriter, r *http.Request) {
 							dataRegPrice = data1.RegularPrice
 						}
 						dataPrice = data1.Price
-						//fmt.Println(data1)
+
 						if len(data1.Attributes) > 0 {
 							if len(data1.Attributes) == 2 {
 								varDatas := map[string]interface{}{
@@ -247,7 +247,6 @@ func (a *App) ProductsPagePost(w http.ResponseWriter, r *http.Request) {
 				if len(data[i].Tags) > 0 {
 					for i3 := 0; i3 < len(data[i].Tags); i3++ {
 						tags := data[i].Tags[i3].Name
-
 						tagsData = append(tagsData, tags)
 					}
 				}
@@ -258,9 +257,6 @@ func (a *App) ProductsPagePost(w http.ResponseWriter, r *http.Request) {
 						//fmt.Println(IDCollection)
 						collectData = append(collectData, strconv.FormatInt(IDCollection, 10))
 					}
-					// var collect interface{}
-					// json.Unmarshal(body, &collect)
-					//fmt.Println(collectData)
 				}
 				values := map[string]map[string]interface{}{
 					"product": {
