@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"golang-test/serve/api/models"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -343,7 +344,7 @@ func postValueToStore(values map[string]map[string]interface{}, url string) {
 }
 
 func getValueFromWp(url string) []byte {
-	token1 := "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9kZXYubG9jYWwiLCJpYXQiOjE1OTE5MzI0MDIsIm5iZiI6MTU5MTkzMjQwMiwiZXhwIjoxNTkyNTM3MjAyLCJkYXRhIjp7InVzZXIiOnsiaWQiOjEsInR5cGUiOiJ3cF91c2VyIiwidXNlcl9sb2dpbiI6ImFkbWluIiwidXNlcl9lbWFpbCI6ImRldi1lbWFpbEBmbHl3aGVlbC5sb2NhbCIsImFwaV9rZXkiOiIxQWZCZXlvU0U1a3Axa2lDMDNaYjJpSURZIn19fQ.5ls54WhX6GDPeMbPTOoVF_aqUqwg7OnkxjXn9qowNR8"
+	token1 := "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9kZXYubG9jYWwiLCJpYXQiOjE1OTI1Mzg3NjUsIm5iZiI6MTU5MjUzODc2NSwiZXhwIjoxNTkzMTQzNTY1LCJkYXRhIjp7InVzZXIiOnsiaWQiOjEsInR5cGUiOiJ3cF91c2VyIiwidXNlcl9sb2dpbiI6ImFkbWluIiwidXNlcl9lbWFpbCI6ImRldi1lbWFpbEBmbHl3aGVlbC5sb2NhbCIsImFwaV9rZXkiOiIxZUJ4aG5CU1g3dGtYbjRuSEtxQ3RtTjJxIn19fQ.tDs07QF7umW3YIIQnZmXbTZoTk8rm1DVJJpe3-j4M_8"
 
 	res, err1 := http.NewRequest("GET", url, nil)
 	res.Header.Set("Content-Type", "application/json")
@@ -406,6 +407,10 @@ func getValueFromStore(url string) []byte {
 		panic(err1)
 	}
 	defer resp1.Body.Close()
+
+	if err1 != nil {
+		log.Fatal(err1)
+	}
 	body, _ := ioutil.ReadAll(resp1.Body)
 
 	return body
