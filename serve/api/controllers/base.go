@@ -59,7 +59,7 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/products", a.ProductsPagePost).Methods("POST")
 	a.Router.HandleFunc("/blogs", a.BlogPageGet).Methods("GET")
 	a.Router.HandleFunc("/pages", a.PageGet).Methods("POST")
-	a.Router.HandleFunc("/article", a.ArticlePageGet).Methods("GET")
+	a.Router.HandleFunc("/articles", a.ArticlePageGet).Methods("POST")
 
 }
 
